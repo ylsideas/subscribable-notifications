@@ -1,0 +1,55 @@
+{
+    "name": "ylsideas/unsubscribable-notification",
+    "description": "A Laravel package for adding unsubscribe links to notifications",
+    "keywords": [
+        "ylsideas",
+        "unsubscribable-notification",
+        "laravel"
+    ],
+    "homepage": "https://github.com/ylsideas/unsubscribable-notification",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Peter Fox",
+            "email": "peter.fox@ylsideas.co",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "illuminate/support": "5.8.*"
+    },
+    "require-dev": {
+        "orchestra/testbench": "3.8.*",
+        "phpunit/phpunit": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ylsideas\\UnsubscribableNotification\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ylsideas\\UnsubscribableNotification\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Ylsideas\\UnsubscribableNotification\\UnsubscribableNotificationServiceProvider"
+            ],
+            "aliases": {
+                "UnsubscribableNotification": "Ylsideas\\UnsubscribableNotification\\UnsubscribableNotificationFacade"
+            }
+        }
+    }
+}
