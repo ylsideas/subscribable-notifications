@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Providers;
+
+use YlsIdeas\SubscribableNotifications\SubscribableApplicationServiceProvider;
+
+class SubscribableServiceProvider extends BaseServiceProvider
+{
+    /**
+     * @var bool
+     */
+    protected $loadRoutes = true;
+
+    /**
+     * @var string
+     */
+    protected $model = '\App\DummyUser';
+
+    /**
+     * @return \Closure
+     */
+    public function onUnsubscribeFromMailingList()
+    {
+        return function ($user, $mailingList) {
+
+        };
+    }
+
+    /**
+     * @return \Closure
+     */
+    public function onUnsubscribeFromAllMailingLists()
+    {
+        return function ($user) {
+
+        };
+    }
+
+    /**
+     * @return \Closure
+     */
+    public function onCompletion()
+    {
+        return function ($user, $mailingList) {
+            return response()
+                ->redirectTo('/');
+        };
+    }
+}
