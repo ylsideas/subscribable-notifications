@@ -2,24 +2,23 @@
 
 namespace YlsIdeas\SubscribableNotifications\Tests\Channels;
 
-use Illuminate\Mail\Events\MessageSending;
-use Illuminate\Mail\Events\MessageSent;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
-use YlsIdeas\SubscribableNotifications\Tests\Support\DummyMailableNotification;
-use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiable;
-use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiableWithSubscriptions;
-use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotification;
-use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotificationWithMailingList;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Mail\Events\MessageSending;
 use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
+use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiable;
+use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotification;
+use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiableWithSubscriptions;
+use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotificationWithMailingList;
 
 class SubscriberMailChannelTest extends TestCase
 {
     protected function getPackageProviders($app)
     {
         return [
-            SubscribableServiceProvider::class
+            SubscribableServiceProvider::class,
         ];
     }
 
@@ -28,7 +27,7 @@ class SubscriberMailChannelTest extends TestCase
     {
         Event::fake([
             MessageSending::class,
-            MessageSent::class
+            MessageSent::class,
         ]);
 
         $expectedNotification = new DummyNotificationWithMailingList();
@@ -85,7 +84,7 @@ class SubscriberMailChannelTest extends TestCase
     {
         Event::fake([
             MessageSending::class,
-            MessageSent::class
+            MessageSent::class,
         ]);
 
         $expectedNotification = new DummyNotification();
@@ -128,7 +127,7 @@ class SubscriberMailChannelTest extends TestCase
     {
         Event::fake([
             MessageSending::class,
-            MessageSent::class
+            MessageSent::class,
         ]);
 
         $expectedNotification = new DummyNotification();
@@ -160,11 +159,11 @@ class SubscriberMailChannelTest extends TestCase
     /** @test */
     public function it_handles_mailables_as_per_inherited_behavior()
     {
-        View::addNamespace('testing', __DIR__ . '/../views');
+        View::addNamespace('testing', __DIR__.'/../views');
 
         Event::fake([
             MessageSending::class,
-            MessageSent::class
+            MessageSent::class,
         ]);
 
         $expectedNotification = new DummyNotification();
@@ -188,7 +187,7 @@ class SubscriberMailChannelTest extends TestCase
     {
         Event::fake([
             MessageSending::class,
-            MessageSent::class
+            MessageSent::class,
         ]);
 
         $notification = new DummyNotification();
@@ -203,11 +202,11 @@ class SubscriberMailChannelTest extends TestCase
     /** @test */
     public function it_uses_views_set_on_the_mail_message_from_the_notification()
     {
-        View::addNamespace('testing', __DIR__ . '/../views');
+        View::addNamespace('testing', __DIR__.'/../views');
 
         Event::fake([
             MessageSending::class,
-            MessageSent::class
+            MessageSent::class,
         ]);
 
         $expectedNotification = new DummyNotification();

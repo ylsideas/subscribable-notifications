@@ -20,7 +20,8 @@ class DummyApplicationServiceProvider extends SubscribableApplicationServiceProv
      */
     public function onUnsubscribeFromMailingList()
     {
-        return function () {};
+        return function () {
+        };
     }
 
     /**
@@ -28,7 +29,8 @@ class DummyApplicationServiceProvider extends SubscribableApplicationServiceProv
      */
     public function onUnsubscribeFromAllMailingLists()
     {
-        return function () {};
+        return function () {
+        };
     }
 
     /**

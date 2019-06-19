@@ -4,7 +4,6 @@ namespace YlsIdeas\SubscribableNotifications\Tests;
 
 use Orchestra\Testbench\TestCase;
 use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
-use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyApplicationServiceProvider;
 
 class SubscribeApplicationServiceProviderTest extends TestCase

@@ -2,17 +2,15 @@
 
 namespace YlsIdeas\SubscribableNotifications\Controllers;
 
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use YlsIdeas\SubscribableNotifications\Subscriber;
 use YlsIdeas\SubscribableNotifications\Events\UserUnsubscribed;
 use YlsIdeas\SubscribableNotifications\Events\UserUnsubscribing;
-use YlsIdeas\SubscribableNotifications\Subscriber;
 
 /**
- * Class UnsubscribeController
- * @package YlsIdeas\SubscribableNotifications\Controllers
+ * Class UnsubscribeController.
  */
 class UnsubscribeController extends Controller
 {

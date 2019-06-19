@@ -3,19 +3,18 @@
 namespace YlsIdeas\SubscribableNotifications\Tests\Controllers;
 
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\URL;
 use Orchestra\Testbench\TestCase;
-use YlsIdeas\SubscribableNotifications\Events\UserUnsubscribed;
-use YlsIdeas\SubscribableNotifications\Events\UserUnsubscribing;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Event;
 use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
+use YlsIdeas\SubscribableNotifications\Events\UserUnsubscribed;
+use YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser;
+use YlsIdeas\SubscribableNotifications\Events\UserUnsubscribing;
 use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyApplicationServiceProvider;
-use YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser;
 
 /**
- * Class UnsubscribeControllerTest
- * @package YlsIdeas\SubscribableNotifications\Tests\Controllers
+ * Class UnsubscribeControllerTest.
  *
  * @covers \YlsIdeas\SubscribableNotifications\Controllers\UnsubscribeController
  */
@@ -112,6 +111,7 @@ class UnsubscribeControllerTest extends TestCase
                 $expected = true;
                 $this->assertEquals($expectedUser->id, $user->id);
                 $this->assertEquals('test', $mailingList);
+
                 return new Response('test');
             }
         );

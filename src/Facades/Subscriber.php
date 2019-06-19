@@ -6,8 +6,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * Class Subscriber
- * @package YlsIdeas\SubscribableNotifications\Facades
+ * Class Subscriber.
  *
  * @method static void routes()
  * @method static string routeName()

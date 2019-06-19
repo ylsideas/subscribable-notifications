@@ -2,17 +2,16 @@
 
 namespace YlsIdeas\SubscribableNotifications\Tests;
 
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
-use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Facades\Route;
 use YlsIdeas\SubscribableNotifications\Subscriber;
+use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
 
 /**
- * Class SubscriberTest
- * @package YlsIdeas\SubscribableNotifications\Tests
+ * Class SubscriberTest.
  *
  * @covers \YlsIdeas\SubscribableNotifications\Subscriber
  */
@@ -21,7 +20,7 @@ class SubscriberTest extends TestCase
     protected function getPackageProviders($app)
     {
         return [
-            SubscribableServiceProvider::class
+            SubscribableServiceProvider::class,
         ];
     }
 

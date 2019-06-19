@@ -2,8 +2,8 @@
 
 namespace YlsIdeas\SubscribableNotifications;
 
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Response;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Route;
 
 class Subscriber
@@ -39,7 +39,7 @@ class Subscriber
 
     public function routes($router = null)
     {
-        $router = $router ??  Route::getFacadeRoot();
+        $router = $router ?? Route::getFacadeRoot();
         $router->get(
             $this->uri,
             $this->hander
@@ -63,6 +63,7 @@ class Subscriber
     {
         if ($model) {
             $this->userModel = $model;
+
             return null;
         }
 
