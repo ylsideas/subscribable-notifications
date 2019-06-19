@@ -4,6 +4,7 @@
 [![Build Status](https://img.shields.io/travis/ylsideas/subscribable-notifications/master.svg?style=flat-square)](https://travis-ci.org/ylsideas/subscribable-notifications)
 [![Quality Score](https://img.shields.io/scrutinizer/g/ylsideas/subscribable-notifications.svg?style=flat-square)](https://scrutinizer-ci.com/g/ylsideas/subscribable-notifications)
 [![Total Downloads](https://img.shields.io/packagist/dt/ylsideas/subscribable-notifications.svg?style=flat-square)](https://packagist.org/packages/ylsideas/subscribable-notifications)
+[![StyleCI](https://github.styleci.io/repos/192806647/shield?branch=master)](https://github.styleci.io/repos/192806647)
 
 This package is designed to help you handle email unsubscribes with as little as 5 minutes setup. After installing
 your notifications sent over email should now be delivered with unsubscribe links in the footer and as a mail header
