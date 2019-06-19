@@ -2,8 +2,8 @@
 
 namespace YlsIdeas\SubscribableNotifications;
 
-use Illuminate\Http\Response;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 
 class Subscriber
