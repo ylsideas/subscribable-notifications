@@ -2,8 +2,8 @@
 
 namespace YlsIdeas\SubscribableNotifications\Tests;
 
-use Illuminate\Support\Facades\File;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Support\Facades\File;
 
 class SubscribableServiceProviderTest extends TestCase
 {

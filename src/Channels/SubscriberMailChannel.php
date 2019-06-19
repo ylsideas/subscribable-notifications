@@ -3,11 +3,11 @@
 namespace YlsIdeas\SubscribableNotifications\Channels;
 
 use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
-use YlsIdeas\SubscribableNotifications\Contracts\AppliesToMailingList;
 use YlsIdeas\SubscribableNotifications\Contracts\CanUnsubscribe;
+use YlsIdeas\SubscribableNotifications\Contracts\AppliesToMailingList;
 
 class SubscriberMailChannel extends MailChannel
 {

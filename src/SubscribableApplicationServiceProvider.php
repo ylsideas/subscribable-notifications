@@ -3,7 +3,6 @@
 namespace YlsIdeas\SubscribableNotifications;
 
 use Illuminate\Support\ServiceProvider;
-use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
 
 abstract class SubscribableApplicationServiceProvider extends ServiceProvider
 {
@@ -44,15 +43,15 @@ abstract class SubscribableApplicationServiceProvider extends ServiceProvider
     /**
      * @return \Closure
      */
-    public abstract function onUnsubscribeFromMailingList();
+    abstract public function onUnsubscribeFromMailingList();
 
     /**
      * @return \Closure
      */
-    public abstract function onUnsubscribeFromAllMailingLists();
+    abstract public function onUnsubscribeFromAllMailingLists();
 
     /**
      * @return \Closure
      */
-    public abstract function onCompletion();
+    abstract public function onCompletion();
 }

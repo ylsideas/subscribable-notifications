@@ -14,7 +14,7 @@ class DummyNotifiableWithSubscriptions implements CanUnsubscribe
     public function unsubscribeLink($service = null): string
     {
         return $service
-            ? 'https://testing.local/unsubscribe/' . $service
+            ? 'https://testing.local/unsubscribe/'.$service
             : 'https://testing.local/unsubscribe';
     }
 }

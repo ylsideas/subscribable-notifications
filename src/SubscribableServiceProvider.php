@@ -2,8 +2,8 @@
 
 namespace YlsIdeas\SubscribableNotifications;
 
-use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Notifications\Channels\MailChannel;
 use YlsIdeas\SubscribableNotifications\Channels\SubscriberMailChannel;
 
 class SubscribableServiceProvider extends ServiceProvider
@@ -21,8 +21,7 @@ class SubscribableServiceProvider extends ServiceProvider
             ], 'subscriber-views');
 
             $this->publishes([
-                __DIR__.'/../stubs/SubscribableServiceProvider.stub' =>
-                    app_path('Providers/SubscribableServiceProvider.php'),
+                __DIR__.'/../stubs/SubscribableServiceProvider.stub' => app_path('Providers/SubscribableServiceProvider.php'),
             ], 'subscriber-provider');
         }
     }

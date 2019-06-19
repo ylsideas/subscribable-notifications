@@ -2,9 +2,8 @@
 
 namespace YlsIdeas\SubscribableNotifications\Tests\Support;
 
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use YlsIdeas\SubscribableNotifications\Contracts\AppliesToMailingList;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class DummyNotification extends Notification
 {

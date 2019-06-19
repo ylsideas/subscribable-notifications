@@ -2,15 +2,13 @@
 
 namespace YlsIdeas\SubscribableNotifications\Tests;
 
-use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
-use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
-use YlsIdeas\SubscribableNotifications\Tests\Support\DummyApplicationServiceProvider;
+use Illuminate\Support\Facades\Route;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser;
+use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
 
 /**
- * Class EmailSubscriberTest
- * @package YlsIdeas\SubscribableNotifications\Tests
+ * Class EmailSubscriberTest.
  */
 class EmailSubscriberTest extends TestCase
 {
@@ -31,7 +29,8 @@ class EmailSubscriberTest extends TestCase
     /** @test */
     public function it_generates_a_signed_url_for_users_to_unsubscribe()
     {
-        Route::get('unsubscribe/{subscriber}/{mailingList?}', function () {})->name('unsubscribe');
+        Route::get('unsubscribe/{subscriber}/{mailingList?}', function () {
+        })->name('unsubscribe');
 
         /** @var DummyUser $user */
         $user = DummyUser::create([
@@ -51,7 +50,8 @@ class EmailSubscriberTest extends TestCase
     /** @test */
     public function it_generates_a_signed_url_for_users_to_unsubscribe_from_a_mailing_list()
     {
-        Route::get('unsubscribe/{subscriber}/{mailingList?}', function () {})->name('unsubscribe');
+        Route::get('unsubscribe/{subscriber}/{mailingList?}', function () {
+        })->name('unsubscribe');
 
         /** @var DummyUser $user */
         $user = DummyUser::create([
