@@ -67,7 +67,7 @@ class SubscriberMailChannel extends MailChannel
             $mailMessage->getHeaders()->addTextHeader(
                 'List-Unsubscribe',
                 sprintf('<%s>', $notifiable->unsubscribeLink(
-                    method_exists($notification, 'usesMailingList')
+                    $notification instanceof AppliesToMailingList
                         ? $notification->usesMailingList()
                         : null
                 ))
