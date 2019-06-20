@@ -26,15 +26,15 @@ class Subscriber
      */
     public $userModel = '\App\User';
     /**
-     * @var \Closure
+     * @var callable
      */
     protected $onUnsubscribeFromMailingList;
     /**
-     * @var \Closure
+     * @var callable
      */
     protected $onUnsubscribeFromAllMailingLists;
     /**
-     * @var \Closure
+     * @var callable
      */
     protected $onCompletion;
 
