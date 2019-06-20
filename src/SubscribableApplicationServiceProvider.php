@@ -41,17 +41,17 @@ abstract class SubscribableApplicationServiceProvider extends ServiceProvider
     }
 
     /**
-     * @return \Closure
+     * @return callable
      */
     abstract public function onUnsubscribeFromMailingList();
 
     /**
-     * @return \Closure
+     * @return callable
      */
     abstract public function onUnsubscribeFromAllMailingLists();
 
     /**
-     * @return \Closure
+     * @return callable
      */
     abstract public function onCompletion();
 }

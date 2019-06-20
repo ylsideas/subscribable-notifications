@@ -2,6 +2,7 @@
 
 namespace YlsIdeas\SubscribableNotifications;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Response;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Route;
@@ -71,27 +72,27 @@ class Subscriber
     }
 
     /**
-     * @param \Closure $handler
+     * @param callable $handler
      */
-    public function onUnsubscribeFromMailingList(\Closure $handler)
+    public function onUnsubscribeFromMailingList(callable $handler)
     {
-        $this->onUnsubscribeFromMailingList = $handler;
+        $this->onUnsubscribeFromMailingList = $this->parseHandler($handler);
     }
 
     /**
-     * @param \Closure $handler
+     * @param callable $handler
      */
-    public function onUnsubscribeFromAllMailingLists(\Closure $handler)
+    public function onUnsubscribeFromAllMailingLists(callable $handler)
     {
-        $this->onUnsubscribeFromAllMailingLists = $handler;
+        $this->onUnsubscribeFromAllMailingLists = $this->parseHandler($handler);
     }
 
     /**
-     * @param \Closure $handler
+     * @param callable $handler
      */
-    public function onCompletion(\Closure $handler)
+    public function onCompletion(callable $handler)
     {
-        $this->onCompletion = $handler;
+        $this->onCompletion = $this->parseHandler($handler);
     }
 
     /**
@@ -119,5 +120,14 @@ class Subscriber
     public function complete($user, ?string $mailingList = null)
     {
         return call_user_func($this->onCompletion, $user, $mailingList);
+    }
+
+    /**
+     * @param callable $handler
+     * @return callable
+     */
+    protected function parseHandler(callable $handler)
+    {
+        return is_string($handler) ? Str::parseCallback($handler) : $handler;
     }
 }
