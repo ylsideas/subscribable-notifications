@@ -5,7 +5,6 @@ namespace YlsIdeas\SubscribableNotifications;
 use Illuminate\Support\Str;
 use Illuminate\Http\Response;
 use InvalidArgumentException;
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Contracts\Foundation\Application;
 
 class Subscriber
@@ -126,7 +125,7 @@ class Subscriber
     }
 
     /**
-     * @param User $user
+     * @param $user
      * @param string|null $mailingList
      * @return Response
      */
