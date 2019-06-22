@@ -2,12 +2,11 @@
 
 namespace YlsIdeas\SubscribableNotifications;
 
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
 use Illuminate\Http\Response;
-use Illuminate\Foundation\Auth\User;
-use Illuminate\Support\Facades\Route;
 use InvalidArgumentException;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Contracts\Foundation\Application;
 
 class Subscriber
 {
@@ -146,6 +145,7 @@ class Subscriber
         if (is_string($handler)) {
             $parsed = Str::parseCallback($handler);
             $parsed[0] = $this->app->make($parsed[0]);
+
             return $parsed;
         } elseif (is_callable($handler)) {
             return $handler;

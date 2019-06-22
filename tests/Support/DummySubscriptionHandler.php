@@ -6,7 +6,6 @@ use Illuminate\Http\Response;
 
 class DummySubscriptionHandler
 {
-
     public function processUnsubscription($user, $mailingList = null)
     {
     }

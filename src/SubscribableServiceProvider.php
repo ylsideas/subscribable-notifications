@@ -2,8 +2,8 @@
 
 namespace YlsIdeas\SubscribableNotifications;
 
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Notifications\Channels\MailChannel;
 use YlsIdeas\SubscribableNotifications\Channels\SubscriberMailChannel;
 
