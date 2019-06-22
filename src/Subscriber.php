@@ -2,10 +2,12 @@
 
 namespace YlsIdeas\SubscribableNotifications;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
 use Illuminate\Http\Response;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Route;
+use InvalidArgumentException;
 
 class Subscriber
 {
@@ -37,10 +39,19 @@ class Subscriber
      * @var callable
      */
     protected $onCompletion;
+    /**
+     * @var Application
+     */
+    protected $app;
+
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
+    }
 
     public function routes($router = null)
     {
-        $router = $router ?? Route::getFacadeRoot();
+        $router = $router ?? $this->app->make('router');
         $router->get(
             $this->uri,
             $this->hander
@@ -72,25 +83,28 @@ class Subscriber
     }
 
     /**
-     * @param callable $handler
+     * @param string|callable $handler
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function onUnsubscribeFromMailingList(callable $handler)
+    public function onUnsubscribeFromMailingList($handler)
     {
         $this->onUnsubscribeFromMailingList = $this->parseHandler($handler);
     }
 
     /**
-     * @param callable $handler
+     * @param string|callable $handler
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function onUnsubscribeFromAllMailingLists(callable $handler)
+    public function onUnsubscribeFromAllMailingLists($handler)
     {
         $this->onUnsubscribeFromAllMailingLists = $this->parseHandler($handler);
     }
 
     /**
-     * @param callable $handler
+     * @param string|callable $handler
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function onCompletion(callable $handler)
+    public function onCompletion($handler)
     {
         $this->onCompletion = $this->parseHandler($handler);
     }
@@ -123,11 +137,20 @@ class Subscriber
     }
 
     /**
-     * @param callable $handler
+     * @param string|callable $handler
      * @return callable
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    protected function parseHandler(callable $handler)
+    protected function parseHandler($handler)
     {
-        return is_string($handler) ? Str::parseCallback($handler) : $handler;
+        if (is_string($handler)) {
+            $parsed = Str::parseCallback($handler);
+            $parsed[0] = $this->app->make($parsed[0]);
+            return $parsed;
+        } elseif (is_callable($handler)) {
+            return $handler;
+        }
+
+        throw new InvalidArgumentException('Handler argument must be either a string or callable.');
     }
 }

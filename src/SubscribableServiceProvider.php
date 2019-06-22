@@ -2,6 +2,7 @@
 
 namespace YlsIdeas\SubscribableNotifications;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Notifications\Channels\MailChannel;
 use YlsIdeas\SubscribableNotifications\Channels\SubscriberMailChannel;
@@ -32,6 +33,8 @@ class SubscribableServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(MailChannel::class, SubscriberMailChannel::class);
-        $this->app->singleton(Subscriber::class);
+        $this->app->singleton(Subscriber::class, function (Application $app) {
+            return new Subscriber($app);
+        });
     }
 }
