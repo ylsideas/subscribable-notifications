@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Route;
 use YlsIdeas\SubscribableNotifications\Subscriber;
 use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
+use YlsIdeas\SubscribableNotifications\Tests\Support\DummySubscriptionHandler;
 
 /**
  * Class SubscriberTest.
@@ -25,9 +26,9 @@ class SubscriberTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_unsubscribing_from_all_mailing_lists()
+    public function it_handles_unsubscribing_from_all_mailing_lists_via_closure()
     {
-        $subscriber = new Subscriber();
+        $subscriber = new Subscriber($this->app);
 
         $expected = false;
         $expectedUser = new User();
@@ -44,9 +45,29 @@ class SubscriberTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_unsubscribing_from_a_mailing_list()
+    public function it_handles_unsubscribing_from_all_mailing_lists_via_string()
     {
-        $subscriber = new Subscriber();
+        $subscriber = new Subscriber($this->app);
+        $dummy = \Mockery::mock(DummySubscriptionHandler::class);
+
+        $this->app->singleton(DummySubscriptionHandler::class, $dummy);
+
+        $expectedUser = new User();
+
+        $dummy->shouldReceive('processUnsubscription')
+            ->with($expectedUser);
+
+        $subscriber->onUnsubscribeFromAllMailingLists(
+            '\YlsIdeas\SubscribableNotifications\Tests\Support\DummySubscriptionHandler@processUnsubscription'
+        );
+
+        $subscriber->unsubscribeFromAllMailingLists($expectedUser);
+    }
+
+    /** @test */
+    public function it_handles_unsubscribing_from_a_mailing_list_via_closure()
+    {
+        $subscriber = new Subscriber($this->app);
 
         $expected = false;
         $expectedUser = new User();
@@ -67,9 +88,30 @@ class SubscriberTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_generating_a_response_for_unsubscribing()
+    public function it_handles_unsubscribing_from_a_mailing_list_via_string()
     {
-        $subscriber = new Subscriber();
+        $subscriber = new Subscriber($this->app);
+        $dummy = \Mockery::mock(DummySubscriptionHandler::class);
+
+        $this->app->singleton(DummySubscriptionHandler::class, $dummy);
+
+        $expectedUser = new User();
+        $expectedMailingList = 'testing-list';
+
+        $dummy->shouldReceive('processUnsubscription')
+            ->with($expectedUser, $expectedMailingList);
+
+        $subscriber->onUnsubscribeFromMailingList(
+            '\YlsIdeas\SubscribableNotifications\Tests\Support\DummySubscriptionHandler@processUnsubscription'
+        );
+
+        $subscriber->unsubscribeFromMailingList($expectedUser, $expectedMailingList);
+    }
+
+    /** @test */
+    public function it_handles_generating_a_response_for_unsubscribing_via_closure()
+    {
+        $subscriber = new Subscriber($this->app);
 
         $expected = false;
         $expectedUser = new User();
@@ -93,9 +135,45 @@ class SubscriberTest extends TestCase
     }
 
     /** @test */
+    public function it_handles_generating_a_response_for_unsubscribing_via_string()
+    {
+        $subscriber = new Subscriber($this->app);
+        $dummy = \Mockery::mock(DummySubscriptionHandler::class);
+
+        $this->app->singleton(DummySubscriptionHandler::class, $dummy);
+
+        $expectedUser = new User();
+        $expectedMailingList = 'testing-list';
+
+        $dummy->shouldReceive('processCompletion')
+            ->with($expectedUser, $expectedMailingList)
+            ->andReturn(new Response());
+
+        $subscriber->onCompletion(
+            '\YlsIdeas\SubscribableNotifications\Tests\Support\DummySubscriptionHandler@processCompletion'
+        );
+
+        $response = $subscriber->complete($expectedUser, $expectedMailingList);
+        $this->assertInstanceOf(Response::class, $response);
+    }
+
+    /** @test */
+    public function it_handles_type_checks_for_a_callable_or_string_handler()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Handler argument must be either a string or callable.');
+
+        $subscriber = new Subscriber($this->app);
+
+        $subscriber->onCompletion(
+            new DummySubscriptionHandler()
+        );
+    }
+
+    /** @test */
     public function it_can_provide_a_user_model()
     {
-        $subscriber = new Subscriber();
+        $subscriber = new Subscriber($this->app);
         $subscriber->userModel = \YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser::class;
 
         $this->assertEquals(
@@ -107,7 +185,7 @@ class SubscriberTest extends TestCase
     /** @test */
     public function it_can_configure_a_user_model()
     {
-        $subscriber = new Subscriber();
+        $subscriber = new Subscriber($this->app);
         $subscriber->userModel(\YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser::class);
 
         $this->assertEquals(
@@ -119,7 +197,7 @@ class SubscriberTest extends TestCase
     /** @test */
     public function it_can_configure_a_route_for_the_unsubscribe_controller()
     {
-        $subscriber = new Subscriber();
+        $subscriber = new Subscriber($this->app);
 
         /** @var Router $router */
         $router = app()->make(Router::class);

@@ -105,38 +105,85 @@ which will be called. The following are just examples of what you can do.
 
 #### Implementing an unsubscribe hook for a specific mailing list
 
+This handler will be called if a user links a link through to unsubscribe for a specific mailing list.
+
 ``` php
-public function onUnsubscribeFromMailingList()
+public class SubscriberServiceProvider
 {
-    return function ($user, $mailingList) {
-        $user->mailing_lists[$mailingList] = false;
-        $user->save();
-    };
+    ...
+    
+    public function onUnsubscribeFromMailingList()
+    {
+        return function ($user, $mailingList) {
+            $user->mailing_lists[$mailingList] = false;
+            $user->save();
+        };
+    }
+    
+    ...
 }
 ```
 
 #### Implementing an unsubscribe hook for all emails
 
+This handler will be called if the user has clicked through to the link to unsubscribe from all future emails.
+
 ``` php
-public function onUnsubscribeFromAllMailingLists()
+public class SubscriberServiceProvider
 {
-    return function ($user) {
-        $user->unsubscribed_at = now();
-        $user->save();
-    };
+    ...
+    
+    public function onUnsubscribeFromAllMailingLists()
+    {
+        return function ($user) {
+            $user->unsubscribed_at = now();
+            $user->save();
+        };
+    }
+    
+    ...
 }
 ```
 
 #### Implementing an unsubscribe response
 
+The completion handler will be called after a user is unsubscribed, allowing you to customise where the user is
+redirected to or if you want to maybe show a further form even.
+
 ``` php
-public function onCompletion()
+public class SubscriberServiceProvider
 {
-    return function ($user, $mailingList) {
-        return response()
-            ->redirectTo('/unsubscribe-complete')
-            ->with('alert', 'You\'re not unsubscribed');
-    };
+    ...
+    
+    public function onCompletion()
+    {
+        return function ($user, $mailingList) {
+            return response()
+                ->redirectTo('/unsubscribe-complete')
+                ->with('alert', 'You\'re not unsubscribed');
+            };
+    }
+    
+    ...
+}  
+```
+
+### Dedicated handler
+
+You may also provide a string in the format of `class@method` that the subscriber class will use to grab the class
+from the service container and then call the specified method on if you want to do something more custom. 
+
+```php
+public class SubscriberServiceProvider
+{
+    ...
+    
+    public function onUnsubscribeFromAllMailingLists()
+    {
+        return '\App\UnsubscribeHandler@handleUnsubscribing';
+    }
+    
+    ...
 }
 ```
 
