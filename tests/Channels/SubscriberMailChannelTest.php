@@ -12,7 +12,6 @@ use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiable;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotification;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiableWithSubscriptions;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotificationWithMailingList;
-use YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser;
 
 class SubscriberMailChannelTest extends TestCase
 {

@@ -2,10 +2,10 @@
 
 namespace YlsIdeas\SubscribableNotifications;
 
-use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\URL;
-use YlsIdeas\SubscribableNotifications\Contracts\AppliesToMailingList;
+use Illuminate\Notifications\Notification;
 use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
+use YlsIdeas\SubscribableNotifications\Contracts\AppliesToMailingList;
 
 trait MailSubscriber
 {
