@@ -56,15 +56,22 @@ which will implement this for you to automatically provide signed urls for the u
 by this library.
 
 ``` php
+use YlsIdeas\SubscribableNotifications\MailSubscriber;
+use YlsIdeas\SubscribableNotifications\Contracts\CanUnsubscribe;
+
 class User implements CanUnsubscribe
 {
     use Notifiable, MailSubscriber;
 }
 ```
 
-### Implementing your own `unsubscribeLink()` method
+### Implementing your own unsubscribe links
+
+If you wish to implement your own completely different `unsubscribeLink()` method you can.
 
 ``` php
+use YlsIdeas\SubscribableNotifications\Contracts\CanUnsubscribe;
+
 class User implements CanUnsubscribe
 {
     use Notifiable;
@@ -87,12 +94,18 @@ This will put two unsubscribe links into your emails generated from those notifi
 One for all emails and one for only that type of email.
 
 ``` php
+use YlsIdeas\SubscribableNotifications\Contracts\AppliesToMailingList;
+
 class Welcome extends Notification implements AppliesToMailingList
 {
+    ...
+    
     public function usesMailingList(): string
     {
-        return 'testing-list';
+        return 'weekly-updates';
     }
+    
+    ...
 }
 ```
 
@@ -185,6 +198,63 @@ public class SubscriberServiceProvider
     
     ...
 }
+```
+
+### Checking if a notification should be sent per the subscription
+
+You can also add hooks to check if a user should receive notifications for a mailing
+list or for all mail notifications.
+
+To do this you need to make sure your user has the 
+`YlsIdeas\SubscribableNotifications\Contracts\CheckSubscriptionStatusBeforeSendingNotifications` interface
+implemented. The `YlsIdeas\SubscribableNotifications\MailSubscriber` will implement this for you to use the
+built in Subscriber handlers.
+
+Then you need to implement the 
+`YlsIdeas\SubscribableNotifications\Contracts\CheckNotifiableSubscriptionStatus` interface on the notifications
+that should trigger a check of the subscription status of the user it's being sent to. Then you just need to return
+`true` if the subscription status should be checked.
+
+``` php
+use YlsIdeas\SubscribableNotifications\Contracts\CheckNotifiableSubscriptionStatus;
+
+class Welcome extends Notification implements CheckNotifiableSubscriptionStatus
+{
+    ...
+    
+    public function checkMailSubscriptionStatus() : bool
+    {
+        return true;
+    }
+    
+    ...
+}
+```
+
+To use the functionality you then need to add your own Subscription check hooks. These hooks can be implemented
+as you see fit.
+
+``` php
+public class SubscriberServiceProvider
+{
+    ...
+
+    public function onCheckSubscriptionStatusOfMailingList()
+    {
+        return function ($user, $mailingList) {
+            return $user->mailing_list[$mailingList] ?? false;
+        };
+    }
+
+    public function onCheckSubscriptionStatusOfAllMailingLists()
+    {
+        return function ($user) {
+            return $user->unsubscribed_at;
+        };
+    }
+    
+    ...
+}  
 ```
 
 ### Customising the email templates
