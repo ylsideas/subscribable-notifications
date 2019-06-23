@@ -16,6 +16,8 @@ class SubscribeApplicationServiceProviderTest extends TestCase
         Subscriber::shouldReceive('onUnsubscribeFromMailingList');
         Subscriber::shouldReceive('onUnsubscribeFromAllMailingLists');
         Subscriber::shouldReceive('onCompletion');
+        Subscriber::shouldReceive('onCheckSubscriptionStatusOfMailingList');
+        Subscriber::shouldReceive('onCheckSubscriptionStatusOfAllMailingLists');
         $provider = new DummyApplicationServiceProvider($this->app);
 
         $provider->shouldLoadRoutes(true);
@@ -31,6 +33,8 @@ class SubscribeApplicationServiceProviderTest extends TestCase
         Subscriber::shouldReceive('onUnsubscribeFromMailingList');
         Subscriber::shouldReceive('onUnsubscribeFromAllMailingLists');
         Subscriber::shouldReceive('onCompletion');
+        Subscriber::shouldReceive('onCheckSubscriptionStatusOfMailingList');
+        Subscriber::shouldReceive('onCheckSubscriptionStatusOfAllMailingLists');
         $provider = new DummyApplicationServiceProvider($this->app);
 
         $provider->shouldLoadRoutes(false);

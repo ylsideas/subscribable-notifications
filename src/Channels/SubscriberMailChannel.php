@@ -8,6 +8,8 @@ use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
 use YlsIdeas\SubscribableNotifications\Contracts\CanUnsubscribe;
 use YlsIdeas\SubscribableNotifications\Contracts\AppliesToMailingList;
+use YlsIdeas\SubscribableNotifications\Contracts\CheckNotifiableSubscriptionStatus;
+use YlsIdeas\SubscribableNotifications\Contracts\CheckSubscriptionStatusBeforeSendingNotifications;
 
 class SubscriberMailChannel extends MailChannel
 {
@@ -21,6 +23,14 @@ class SubscriberMailChannel extends MailChannel
      */
     public function send($notifiable, Notification $notification)
     {
+        // Check if the user would want the mail
+        if ($notifiable instanceof CheckSubscriptionStatusBeforeSendingNotifications &&
+            $notification instanceof CheckNotifiableSubscriptionStatus &&
+            $notification->checkMailSubscriptionStatus() &&
+            ! $notifiable->mailSubscriptionStatus($notification)) {
+            return;
+        }
+
         $message = $notification->toMail($notifiable);
 
         // Inject unsubscribe links for rendering in the view

@@ -12,6 +12,7 @@ use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiable;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotification;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiableWithSubscriptions;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotificationWithMailingList;
+use YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser;
 
 class SubscriberMailChannelTest extends TestCase
 {
@@ -180,6 +181,25 @@ class SubscriberMailChannelTest extends TestCase
 
             return true;
         });
+    }
+
+    /** @test */
+    public function it_checks_if_a_notifiable_is_subscribed_to_receive_the_notification()
+    {
+        Event::fake([
+            MessageSending::class,
+            MessageSent::class,
+        ]);
+
+        $notification = new DummyNotificationWithMailingList();
+        $notifiable = new DummyNotifiableWithSubscriptions();
+
+        $notification->shouldCheck = true;
+        $notifiable->isSubscribed = false;
+
+        $notifiable->notify($notification);
+
+        Event::assertNotDispatched(MessageSending::class);
     }
 
     /** @test */

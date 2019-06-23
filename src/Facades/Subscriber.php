@@ -14,9 +14,12 @@ use Illuminate\Support\Facades\Facade;
  * @method static void onCompletion(callable|string $handler)
  * @method static void onUnsubscribeFromMailingList(callable|string $handler)
  * @method static void onUnsubscribeFromAllMailingLists(callable|string $handler)
+ * @method static void onCheckSubscriptionStatusOfAllMailingLists(callable|string $handler)
+ * @method static void onCheckSubscriptionStatusOfMailingList(callable|string $handler)
  * @method static void unsubscribeFromMailingList($user, string $mailingList)
  * @method static void unsubscribeFromAllMailingLists($user)
  * @method static Response complete($user, ?string $mailingList = null)
+ * @method static bool checkSubscriptionStatus($user, ?string $mailingList = null)
  */
 class Subscriber extends Facade
 {

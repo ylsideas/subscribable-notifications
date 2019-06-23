@@ -43,4 +43,24 @@ class DummyApplicationServiceProvider extends SubscribableApplicationServiceProv
                 ->redirectTo('/');
         };
     }
+
+    /**
+     * @return callable|string
+     */
+    public function onCheckSubscriptionStatusOfMailingList()
+    {
+        return function () {
+            return true;
+        };
+    }
+
+    /**
+     * @return callable|string
+     */
+    public function onCheckSubscriptionStatusOfAllMailingLists()
+    {
+        return function () {
+            return true;
+        };
+    }
 }
