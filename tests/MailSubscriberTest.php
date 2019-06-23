@@ -4,13 +4,16 @@ namespace YlsIdeas\SubscribableNotifications\Tests;
 
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
+use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser;
 use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
+use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotification;
+use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotificationWithMailingList;
 
 /**
- * Class EmailSubscriberTest.
+ * Class MailSubscriberTest.
  */
-class EmailSubscriberTest extends TestCase
+class MailSubscriberTest extends TestCase
 {
     public function setUp(): void
     {
@@ -33,7 +36,8 @@ class EmailSubscriberTest extends TestCase
         })->name('unsubscribe');
 
         /** @var DummyUser $user */
-        $user = DummyUser::create([
+        $user = DummyUser::make([
+            'id' => 1,
             'name' => 'test',
             'email' => 'test@testing.local',
             'password' => 'test',
@@ -54,7 +58,8 @@ class EmailSubscriberTest extends TestCase
         })->name('unsubscribe');
 
         /** @var DummyUser $user */
-        $user = DummyUser::create([
+        $user = DummyUser::make([
+            'id' => 1,
             'name' => 'test',
             'email' => 'test@testing.local',
             'password' => 'test',
@@ -66,5 +71,43 @@ class EmailSubscriberTest extends TestCase
             'http://localhost/unsubscribe/1/test?signature=edaf5bee199875521054535be04273c5006e4d6d834c98a83a3aa16a92223814',
             $url
         );
+    }
+
+    /** @test */
+    public function it_can_check_its_subscription_status_for_all_mailing_lists()
+    {
+        /** @var DummyUser $user */
+        $user = DummyUser::make([
+            'name' => 'test',
+            'email' => 'test@testing.local',
+            'password' => 'test',
+        ]);
+
+        $notification = new DummyNotification();
+
+        Subscriber::shouldReceive('checkSubscriptionStatus')
+            ->with($user, null)
+            ->andReturn(true);
+
+        $this->assertTrue($user->mailSubscriptionStatus($notification));
+    }
+
+    /** @test */
+    public function it_can_check_its_subscription_status_for_one_mailing_list()
+    {
+        /** @var DummyUser $user */
+        $user = DummyUser::make([
+            'name' => 'test',
+            'email' => 'test@testing.local',
+            'password' => 'test',
+        ]);
+
+        $notification = new DummyNotificationWithMailingList();
+
+        Subscriber::shouldReceive('checkSubscriptionStatus')
+            ->with($user, 'testing-list')
+            ->andReturn(true);
+
+        $this->assertTrue($user->mailSubscriptionStatus($notification));
     }
 }

@@ -33,6 +33,12 @@ abstract class SubscribableApplicationServiceProvider extends ServiceProvider
         \YlsIdeas\SubscribableNotifications\Facades\Subscriber::onCompletion(
             $this->onCompletion()
         );
+        \YlsIdeas\SubscribableNotifications\Facades\Subscriber::onCheckSubscriptionStatusOfMailingList(
+            $this->onCheckSubscriptionStatusOfMailingList()
+        );
+        \YlsIdeas\SubscribableNotifications\Facades\Subscriber::onCheckSubscriptionStatusOfAllMailingLists(
+            $this->onCheckSubscriptionStatusOfAllMailingLists()
+        );
     }
 
     public function loadRoutes()
@@ -54,4 +60,14 @@ abstract class SubscribableApplicationServiceProvider extends ServiceProvider
      * @return callable|string
      */
     abstract public function onCompletion();
+
+    /**
+     * @return callable|string
+     */
+    abstract public function onCheckSubscriptionStatusOfMailingList();
+
+    /**
+     * @return callable|string
+     */
+    abstract public function onCheckSubscriptionStatusOfAllMailingLists();
 }

@@ -5,9 +5,12 @@ namespace YlsIdeas\SubscribableNotifications\Tests\Support;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
 use YlsIdeas\SubscribableNotifications\Contracts\AppliesToMailingList;
+use YlsIdeas\SubscribableNotifications\Contracts\CheckNotifiableSubscriptionStatus;
 
-class DummyNotificationWithMailingList extends Notification implements AppliesToMailingList
+class DummyNotificationWithMailingList extends Notification implements AppliesToMailingList, CheckNotifiableSubscriptionStatus
 {
+    public $shouldCheck = false;
+
     /**
      * Get the notification's delivery channels.
      *
@@ -41,5 +44,10 @@ class DummyNotificationWithMailingList extends Notification implements AppliesTo
     public function usesMailingList(): string
     {
         return 'testing-list';
+    }
+
+    public function checkMailSubscriptionStatus(): bool
+    {
+        return $this->shouldCheck;
     }
 }

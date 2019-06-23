@@ -3,7 +3,9 @@
 namespace YlsIdeas\SubscribableNotifications;
 
 use Illuminate\Support\Facades\URL;
+use Illuminate\Notifications\Notification;
 use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
+use YlsIdeas\SubscribableNotifications\Contracts\AppliesToMailingList;
 
 trait MailSubscriber
 {
@@ -16,6 +18,20 @@ trait MailSubscriber
         return URL::signedRoute(
             Subscriber::routeName(),
             ['subscriber' => $this, 'mailingList' => $mailingList]
+        );
+    }
+
+    /**
+     * @param Notification $notification
+     * @return bool
+     */
+    public function mailSubscriptionStatus(Notification $notification) : bool
+    {
+        return Subscriber::checkSubscriptionStatus(
+            $this,
+            $notification instanceof AppliesToMailingList
+                ? $notification->usesMailingList()
+                : null
         );
     }
 }

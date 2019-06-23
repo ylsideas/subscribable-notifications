@@ -6,10 +6,8 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Foundation\Auth\User;
-use Illuminate\Support\Facades\Route;
 use YlsIdeas\SubscribableNotifications\Subscriber;
 use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
-use YlsIdeas\SubscribableNotifications\Tests\Support\DummySubscriptionHandler;
 
 /**
  * Class SubscriberTest.
@@ -48,17 +46,20 @@ class SubscriberTest extends TestCase
     public function it_handles_unsubscribing_from_all_mailing_lists_via_string()
     {
         $subscriber = new Subscriber($this->app);
-        $dummy = \Mockery::mock(DummySubscriptionHandler::class);
-
-        $this->app->singleton(DummySubscriptionHandler::class, $dummy);
+        $dummy = \Mockery::mock();
 
         $expectedUser = new User();
 
         $dummy->shouldReceive('processUnsubscription')
-            ->with($expectedUser);
+            ->with($expectedUser)
+            ->once();
+
+        $this->app->singleton('\DummyClass', function () use ($dummy) {
+            return $dummy;
+        });
 
         $subscriber->onUnsubscribeFromAllMailingLists(
-            '\YlsIdeas\SubscribableNotifications\Tests\Support\DummySubscriptionHandler@processUnsubscription'
+            '\DummyClass@processUnsubscription'
         );
 
         $subscriber->unsubscribeFromAllMailingLists($expectedUser);
@@ -91,18 +92,21 @@ class SubscriberTest extends TestCase
     public function it_handles_unsubscribing_from_a_mailing_list_via_string()
     {
         $subscriber = new Subscriber($this->app);
-        $dummy = \Mockery::mock(DummySubscriptionHandler::class);
-
-        $this->app->singleton(DummySubscriptionHandler::class, $dummy);
+        $dummy = \Mockery::mock();
 
         $expectedUser = new User();
         $expectedMailingList = 'testing-list';
 
         $dummy->shouldReceive('processUnsubscription')
-            ->with($expectedUser, $expectedMailingList);
+            ->with($expectedUser, $expectedMailingList)
+            ->once();
+
+        $this->app->singleton('\DummyClass', function () use ($dummy) {
+            return $dummy;
+        });
 
         $subscriber->onUnsubscribeFromMailingList(
-            '\YlsIdeas\SubscribableNotifications\Tests\Support\DummySubscriptionHandler@processUnsubscription'
+            '\DummyClass@processUnsubscription'
         );
 
         $subscriber->unsubscribeFromMailingList($expectedUser, $expectedMailingList);
@@ -138,23 +142,153 @@ class SubscriberTest extends TestCase
     public function it_handles_generating_a_response_for_unsubscribing_via_string()
     {
         $subscriber = new Subscriber($this->app);
-        $dummy = \Mockery::mock(DummySubscriptionHandler::class);
-
-        $this->app->singleton(DummySubscriptionHandler::class, $dummy);
+        $dummy = \Mockery::mock();
 
         $expectedUser = new User();
         $expectedMailingList = 'testing-list';
 
         $dummy->shouldReceive('processCompletion')
             ->with($expectedUser, $expectedMailingList)
-            ->andReturn(new Response());
+            ->andReturn(new Response())
+            ->once();
+
+        $this->app->singleton('\DummyClass', function () use ($dummy) {
+            return $dummy;
+        });
 
         $subscriber->onCompletion(
-            '\YlsIdeas\SubscribableNotifications\Tests\Support\DummySubscriptionHandler@processCompletion'
+            '\DummyClass@processCompletion'
         );
 
         $response = $subscriber->complete($expectedUser, $expectedMailingList);
         $this->assertInstanceOf(Response::class, $response);
+    }
+
+    /** @test */
+    public function it_handles_checking_subscription_status_of_a_mailing_list_via_closure()
+    {
+        $subscriber = new Subscriber($this->app);
+
+        $expectedFirst = false;
+        $expectedSecond = false;
+        $expectedUser = new User();
+        $expectedMailingList = 'testing-list';
+
+        $subscriber->onCheckSubscriptionStatusOfAllMailingLists(
+            function ($user) use (&$expectedFirst, $expectedUser) {
+                $expectedFirst = true;
+                $this->assertInstanceOf(User::class, $user);
+                $this->assertSame($expectedUser, $user);
+
+                return true;
+            }
+        );
+
+        $subscriber->onCheckSubscriptionStatusOfMailingList(
+            function ($user, $mailingList) use (&$expectedSecond, $expectedUser, $expectedMailingList) {
+                $expectedSecond = true;
+                $this->assertInstanceOf(User::class, $user);
+                $this->assertSame($expectedUser, $user);
+                $this->assertSame($expectedMailingList, $mailingList);
+
+                return true;
+            }
+        );
+
+        $this->assertTrue($subscriber->checkSubscriptionStatus($expectedUser, $expectedMailingList));
+
+        $this->assertTrue($expectedFirst);
+        $this->assertTrue($expectedSecond);
+    }
+
+    /** @test */
+    public function it_handles_checking_subscription_status_of_a_mailing_list_via_string()
+    {
+        $subscriber = new Subscriber($this->app);
+        $dummy = \Mockery::mock();
+
+        $expectedUser = new User();
+        $expectedMailingList = 'testing-list';
+
+        $dummy->shouldReceive('getSubscriptionStatus')
+            ->with($expectedUser)
+            ->andReturn(true)
+            ->once();
+
+        $dummy->shouldReceive('getSubscriptionStatus')
+            ->with($expectedUser, $expectedMailingList)
+            ->andReturn(true)
+            ->once();
+
+        $this->app->singleton('\DummyClass', function () use ($dummy) {
+            return $dummy;
+        });
+
+        $subscriber->onCheckSubscriptionStatusOfAllMailingLists(
+            '\DummyClass@getSubscriptionStatus'
+        );
+
+        $subscriber->onCheckSubscriptionStatusOfMailingList(
+            '\DummyClass@getSubscriptionStatus'
+        );
+
+        $this->assertTrue($subscriber->checkSubscriptionStatus($expectedUser, $expectedMailingList));
+    }
+
+    /** @test */
+    public function it_handles_checking_subscription_status_of_all_mailing_lists_via_closure()
+    {
+        $subscriber = new Subscriber($this->app);
+
+        $expected = false;
+        $expectedUser = new User();
+
+        $subscriber->onCheckSubscriptionStatusOfAllMailingLists(
+            function ($user) use (&$expected, $expectedUser) {
+                $expected = true;
+                $this->assertInstanceOf(User::class, $user);
+                $this->assertSame($expectedUser, $user);
+
+                return true;
+            }
+        );
+
+        $this->assertTrue($subscriber->checkSubscriptionStatus($expectedUser));
+        $this->assertTrue($expected);
+    }
+
+    /** @test */
+    public function it_handles_checking_subscription_status_of_all_mailing_lists_via_string()
+    {
+        $subscriber = new Subscriber($this->app);
+        $dummy = \Mockery::mock();
+
+        $expectedUser = new User();
+        $notExpectedMailingList = 'testing-list';
+
+        $dummy->shouldReceive('getSubscriptionStatus')
+            ->with($expectedUser)
+            ->andReturn(true)
+            ->once();
+
+        $dummy->shouldReceive('getSubscriptionStatus')
+            ->with($expectedUser, $notExpectedMailingList)
+            ->andReturn(true)
+            ->never();
+
+        $this->app->singleton('\DummyClass', function () use ($dummy) {
+            return $dummy;
+        });
+
+        $subscriber->onCheckSubscriptionStatusOfAllMailingLists(
+            '\DummyClass@getSubscriptionStatus'
+        );
+
+        $subscriber->onCheckSubscriptionStatusOfMailingList(
+            '\DummyClass@getSubscriptionStatus'
+        );
+
+        $this->assertTrue($subscriber->checkSubscriptionStatus($expectedUser));
     }
 
     /** @test */
@@ -166,7 +300,7 @@ class SubscriberTest extends TestCase
         $subscriber = new Subscriber($this->app);
 
         $subscriber->onCompletion(
-            new DummySubscriptionHandler()
+            new \stdClass()
         );
     }
 

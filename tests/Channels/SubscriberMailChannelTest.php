@@ -183,6 +183,25 @@ class SubscriberMailChannelTest extends TestCase
     }
 
     /** @test */
+    public function it_checks_if_a_notifiable_is_subscribed_to_receive_the_notification()
+    {
+        Event::fake([
+            MessageSending::class,
+            MessageSent::class,
+        ]);
+
+        $notification = new DummyNotificationWithMailingList();
+        $notifiable = new DummyNotifiableWithSubscriptions();
+
+        $notification->shouldCheck = true;
+        $notifiable->isSubscribed = false;
+
+        $notifiable->notify($notification);
+
+        Event::assertNotDispatched(MessageSending::class);
+    }
+
+    /** @test */
     public function it_does_not_send_mail_if_there_is_no_email_to_route_to()
     {
         Event::fake([
