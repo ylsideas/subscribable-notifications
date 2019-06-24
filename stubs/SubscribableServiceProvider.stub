@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use YlsIdeas\SubscribableNotifications\SubscribableApplicationServiceProvider;
 
-class SubscribableServiceProvider extends BaseServiceProvider
+class SubscribableServiceProvider extends SubscribableApplicationServiceProvider
 {
     /**
      * @var bool
@@ -17,7 +17,7 @@ class SubscribableServiceProvider extends BaseServiceProvider
     protected $model = '\App\DummyUser';
 
     /**
-     * @return \Closure
+     * @return callable|string
      */
     public function onUnsubscribeFromMailingList()
     {
@@ -27,7 +27,7 @@ class SubscribableServiceProvider extends BaseServiceProvider
     }
 
     /**
-     * @return \Closure
+     * @return callable|string
      */
     public function onUnsubscribeFromAllMailingLists()
     {
@@ -37,13 +37,33 @@ class SubscribableServiceProvider extends BaseServiceProvider
     }
 
     /**
-     * @return \Closure
+     * @return callable|string
      */
     public function onCompletion()
     {
         return function ($user, $mailingList) {
             return response()
                 ->redirectTo('/');
+        };
+    }
+
+    /**
+     * @return callable|string
+     */
+    public function onCheckSubscriptionStatusOfMailingList()
+    {
+        return function ($user, $mailingList) {
+            return true;
+        };
+    }
+
+    /**
+     * @return callable|string
+     */
+    public function onCheckSubscriptionStatusOfAllMailingLists()
+    {
+        return function ($user) {
+            return true;
         };
     }
 }

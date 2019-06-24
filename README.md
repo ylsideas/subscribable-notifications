@@ -37,7 +37,7 @@ in `config/app.php`.
     /*
      * Package Service Providers...
      */
-     \App\Providers\SubscriberServiceProvider::class,
+     \App\Providers\SubscribableServiceProvider::class,
      
      ...
 ]
