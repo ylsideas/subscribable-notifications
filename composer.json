@@ -45,7 +45,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "YlsIdeas\\UnsubscribableNotification\\SubscribableNotificationsServiceProvider"
+                "YlsIdeas\\SubscribableNotifications\\SubscribableServiceProvider"
             ],
             "aliases": {
                 "Subscriber": "YlsIdeas\\Facades\\Subscriber"
