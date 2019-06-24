@@ -249,7 +249,7 @@ public class SubscriberServiceProvider
     public function onCheckSubscriptionStatusOfAllMailingLists()
     {
         return function ($user) {
-            return $user->unsubscribed_at;
+            return $user->unsubscribed_at !== null;
         };
     }
     
