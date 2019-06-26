@@ -76,11 +76,12 @@ class User implements CanUnsubscribe
 {
     use Notifiable;
     
-    public function unsubscribeLink(?string $mailingList = null): string
+    public function unsubscribeLink(?string $mailingList = ''): string
     {
         return URL::signedRoute(
             'sorry-to-see-you-go,
-            ['subscriber' => $this, 'mailingList' => $mailingList]
+            ['subscriber' => $this, 'mailingList' => $mailingList],
+            now()->addDays(1);
         );
     }
 }
@@ -128,7 +129,7 @@ public class SubscriberServiceProvider
     public function onUnsubscribeFromMailingList()
     {
         return function ($user, $mailingList) {
-            $user->mailing_lists[$mailingList] = false;
+            $user->mailing_lists = $user->mailing_lists->put($mailingList, false);
             $user->save();
         };
     }
@@ -171,8 +172,7 @@ public class SubscriberServiceProvider
     public function onCompletion()
     {
         return function ($user, $mailingList) {
-            return response()
-                ->redirectTo('/unsubscribe-complete')
+            return view('confirmation')
                 ->with('alert', 'You\'re not unsubscribed');
             };
     }
@@ -242,14 +242,14 @@ public class SubscriberServiceProvider
     public function onCheckSubscriptionStatusOfMailingList()
     {
         return function ($user, $mailingList) {
-            return $user->mailing_list[$mailingList] ?? false;
+            return $user->mailing_lists->get($mailingList, false);
         };
     }
 
     public function onCheckSubscriptionStatusOfAllMailingLists()
     {
         return function ($user) {
-            return $user->unsubscribed_at !== null;
+            return $user->unsubscribed_at === null;
         };
     }
     
