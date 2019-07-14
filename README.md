@@ -3,6 +3,7 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/ylsideas/subscribable-notifications.svg?style=flat-square)](https://packagist.org/packages/ylsideas/subscribable-notifications)
 [![Build Status](https://img.shields.io/travis/ylsideas/subscribable-notifications/master.svg?style=flat-square)](https://travis-ci.org/ylsideas/subscribable-notifications)
 [![Quality Score](https://img.shields.io/scrutinizer/g/ylsideas/subscribable-notifications.svg?style=flat-square)](https://scrutinizer-ci.com/g/ylsideas/subscribable-notifications)
+[![Code Coverage](https://scrutinizer-ci.com/g/ylsideas/subscribable-notifications/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/ylsideas/subscribable-notifications/?branch=master)
 [![Total Downloads](https://img.shields.io/packagist/dt/ylsideas/subscribable-notifications.svg?style=flat-square)](https://packagist.org/packages/ylsideas/subscribable-notifications)
 [![StyleCI](https://github.styleci.io/repos/192806647/shield?branch=master)](https://github.styleci.io/repos/192806647)
 
