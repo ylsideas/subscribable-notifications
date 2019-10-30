@@ -12,11 +12,6 @@ class SubscribableServiceProvider extends SubscribableApplicationServiceProvider
     protected $loadRoutes = true;
 
     /**
-     * @var string
-     */
-    protected $model = '\App\DummyUser';
-
-    /**
      * @return callable|string
      */
     public function onUnsubscribeFromMailingList()
