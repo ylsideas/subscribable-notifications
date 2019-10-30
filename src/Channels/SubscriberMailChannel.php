@@ -98,8 +98,8 @@ class SubscriberMailChannel extends MailChannel
         }
 
         return [
-            'html' => $this->markdown->render('unsubscribe::html', $message->data()),
-            'text' => $this->markdown->renderText('unsubscribe::text', $message->data()),
+            'html' => $this->markdown->render('subscriber::html', $message->data()),
+            'text' => $this->markdown->renderText('subscriber::text', $message->data()),
         ];
     }
 }

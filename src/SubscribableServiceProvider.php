@@ -14,7 +14,7 @@ class SubscribableServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'unsubscribe');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'subscriber');
 
         if ($this->app->runningInConsole()) {
             $this->publishes([

@@ -2,8 +2,10 @@
 
 namespace YlsIdeas\SubscribableNotifications\Tests;
 
+use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\File;
+use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
 
 class SubscribableServiceProviderTest extends TestCase
 {
@@ -30,6 +32,15 @@ class SubscribableServiceProviderTest extends TestCase
         ]);
 
         $this->assertTrue(File::exists(resource_path('views/vendor/subscriber')));
+    }
+
+    /** @test */
+    public function it_loads_views()
+    {
+        $this->app->register(SubscribableServiceProvider::class);
+
+        $this->assertTrue(View::exists('subscriber::html'));
+        $this->assertTrue(View::exists('subscriber::text'));
     }
 
     /** @test */
