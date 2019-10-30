@@ -1,4 +1,4 @@
-@component('unsubscribe::mail.text.message')
+@component('subscriber::mail.text.message')
 {{-- Greeting --}}
 @if (! empty($greeting))
 # {{ $greeting }}
