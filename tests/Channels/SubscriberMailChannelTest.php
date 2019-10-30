@@ -12,6 +12,7 @@ use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiable;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotification;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiableWithSubscriptions;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotificationWithMailingList;
+use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotificationWithQueuing;
 
 class SubscriberMailChannelTest extends TestCase
 {
@@ -67,6 +68,49 @@ class SubscriberMailChannelTest extends TestCase
 
             $this->assertStringContainsString(
                 'https://testing.local/unsubscribe/testing-list',
+                $event->message->getBody()
+            );
+
+            $this->assertStringContainsString(
+                'https://testing.local/unsubscribe',
+                $event->message->getBody()
+            );
+
+            return true;
+        });
+    }
+
+    /** @test */
+    public function it_sends_mail_notifications_with_mailing_links_via_queues()
+    {
+        Event::fake([
+            MessageSending::class,
+            MessageSent::class,
+        ]);
+
+        $expectedNotification = new DummyNotificationWithQueuing();
+        $notifiable = new DummyNotifiableWithSubscriptions();
+
+        $notifiable->notify($expectedNotification);
+
+        Event::assertDispatched(MessageSending::class, function (MessageSending $event) {
+            $this->assertArrayHasKey('unsubscribeLinkForAll', $event->data);
+
+            $this->assertEquals(
+                'https://testing.local/unsubscribe',
+                $event->data['unsubscribeLinkForAll']
+            );
+
+            $this->assertTrue(
+                $event->message->getHeaders()->has('List-Unsubscribe')
+            );
+            $this->assertEquals(
+                '<https://testing.local/unsubscribe>',
+                $event->message->getHeaders()->get('List-Unsubscribe')->getFieldBody()
+            );
+
+            $this->assertStringContainsString(
+                'To no longer receive any future emails',
                 $event->message->getBody()
             );
 
