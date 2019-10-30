@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Facade;
 /**
  * Class Subscriber.
  *
+ * @see \YlsIdeas\SubscribableNotifications\Subscriber
+ *
  * @method static void routes()
  * @method static string routeName()
  * @method static userModel(string $model = null)
