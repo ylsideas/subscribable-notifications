@@ -80,9 +80,9 @@ class User implements CanUnsubscribe
     public function unsubscribeLink(?string $mailingList = ''): string
     {
         return URL::signedRoute(
-            'sorry-to-see-you-go,
+            'sorry-to-see-you-go',
             ['subscriber' => $this, 'mailingList' => $mailingList],
-            now()->addDays(1);
+            now()->addDays(1)
         );
     }
 }
@@ -175,7 +175,7 @@ public class SubscriberServiceProvider
         return function ($user, $mailingList) {
             return view('confirmation')
                 ->with('alert', 'You\'re not unsubscribed');
-            };
+        };
     }
     
     ...
@@ -208,8 +208,33 @@ list or for all mail notifications.
 
 To do this you need to make sure your user has the 
 `YlsIdeas\SubscribableNotifications\Contracts\CheckSubscriptionStatusBeforeSendingNotifications` interface
-implemented. The `YlsIdeas\SubscribableNotifications\MailSubscriber` will implement this for you to use the
+implemented. The `YlsIdeas\SubscribableNotifications\MailSubscriber` trait will implement this for you to use the
 built in Subscriber handlers.
+
+If you want to implement a method yourself to check the subscription you could also just implement the method yourself
+like in the example below.
+
+``` php
+use YlsIdeas\SubscribableNotifications\Contracts\CanUnsubscribe;
+use YlsIdeas\SubscribableNotifications\Contracts\CheckSubscriptionStatusBeforeSendingNotifications;
+use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
+
+class User implements CanUnsubscribe, CheckSubscriptionStatusBeforeSendingNotifications
+{
+    use Notifiable;
+    
+    
+    public function mailSubscriptionStatus(Notification $notification) : bool
+    {
+        return Subscriber::checkSubscriptionStatus(
+            $this,
+            $notification instanceof AppliesToMailingList
+                ? $notification->usesMailingList()
+                : null
+        );
+    }
+}
+```
 
 Then you need to implement the 
 `YlsIdeas\SubscribableNotifications\Contracts\CheckNotifiableSubscriptionStatus` interface on the notifications
