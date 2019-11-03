@@ -2,12 +2,12 @@
 
 namespace YlsIdeas\SubscribableNotifications\Tests;
 
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Foundation\Auth\User;
-use YlsIdeas\SubscribableNotifications\Subscriber;
 use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
+use YlsIdeas\SubscribableNotifications\Subscriber;
 
 /**
  * Class SubscriberTest.
