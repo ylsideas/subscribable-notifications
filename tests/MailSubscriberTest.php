@@ -2,13 +2,13 @@
 
 namespace YlsIdeas\SubscribableNotifications\Tests;
 
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\TestCase;
 use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
-use YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser;
 use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotification;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotificationWithMailingList;
+use YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser;
 
 /**
  * Class MailSubscriberTest.

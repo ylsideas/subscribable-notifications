@@ -2,9 +2,9 @@
 
 namespace YlsIdeas\SubscribableNotifications\Tests;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\File;
 use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
 
 class SubscribableServiceProviderTest extends TestCase

@@ -2,10 +2,10 @@
 
 namespace YlsIdeas\SubscribableNotifications;
 
-use Illuminate\Support\Str;
-use Illuminate\Http\Response;
-use InvalidArgumentException;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\Response;
+use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class Subscriber
 {

@@ -3,15 +3,15 @@
 namespace YlsIdeas\SubscribableNotifications\Tests\Controllers;
 
 use Illuminate\Http\Response;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Event;
-use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
+use Illuminate\Support\Facades\URL;
+use Orchestra\Testbench\TestCase;
 use YlsIdeas\SubscribableNotifications\Events\UserUnsubscribed;
-use YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser;
 use YlsIdeas\SubscribableNotifications\Events\UserUnsubscribing;
+use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
 use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyApplicationServiceProvider;
+use YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser;
 
 /**
  * Class UnsubscribeControllerTest.

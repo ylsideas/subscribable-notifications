@@ -2,15 +2,15 @@
 
 namespace YlsIdeas\SubscribableNotifications\Tests\Channels;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Mail\Events\MessageSending;
+use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\View;
+use Orchestra\Testbench\TestCase;
 use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiable;
-use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotification;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiableWithSubscriptions;
+use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotification;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotificationWithMailingList;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotificationWithQueuing;
 
