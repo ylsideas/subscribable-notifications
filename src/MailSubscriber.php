@@ -25,7 +25,7 @@ trait MailSubscriber
      * @param Notification $notification
      * @return bool
      */
-    public function mailSubscriptionStatus(Notification $notification) : bool
+    public function mailSubscriptionStatus(Notification $notification): bool
     {
         return Subscriber::checkSubscriptionStatus(
             $this,

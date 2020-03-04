@@ -4,5 +4,5 @@ namespace YlsIdeas\SubscribableNotifications\Contracts;
 
 interface CheckNotifiableSubscriptionStatus
 {
-    public function checkMailSubscriptionStatus() : bool;
+    public function checkMailSubscriptionStatus(): bool;
 }
