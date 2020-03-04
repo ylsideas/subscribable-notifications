@@ -6,5 +6,5 @@ use Illuminate\Notifications\Notification;
 
 interface CheckSubscriptionStatusBeforeSendingNotifications
 {
-    public function mailSubscriptionStatus(Notification $notification) : bool;
+    public function mailSubscriptionStatus(Notification $notification): bool;
 }
