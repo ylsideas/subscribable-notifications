@@ -3,6 +3,7 @@
 namespace YlsIdeas\SubscribableNotifications\Channels;
 
 use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -13,6 +14,13 @@ use YlsIdeas\SubscribableNotifications\Contracts\CheckSubscriptionStatusBeforeSe
 
 class SubscriberMailChannel extends MailChannel
 {
+    /**
+     * The mailer implementation.
+     *
+     * @var Mailer
+     */
+    protected $mailer;
+
     /**
      * Send the given notification.
      *
@@ -31,7 +39,11 @@ class SubscriberMailChannel extends MailChannel
             return;
         }
 
-        $message = $notification->toMail($notifiable);
+        if (method_exists($notification, 'toMail')) {
+            $message = $notification->toMail($notifiable);
+        } else {
+            throw new \RuntimeException('Notification does not support sending mail');
+        }
 
         // Inject unsubscribe links for rendering in the view
         if ($notifiable instanceof CanUnsubscribe && $message instanceof MailMessage) {
@@ -49,7 +61,9 @@ class SubscriberMailChannel extends MailChannel
         }
 
         if ($message instanceof Mailable) {
-            return $message->send($this->mailer);
+            $message->send($this->mailer);
+
+            return;
         }
 
         $this->mailer->send(

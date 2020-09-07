@@ -42,7 +42,8 @@ class SubscriberMailChannelTest extends TestCase
 
             $this->assertEquals(
                 'https://testing.local/unsubscribe/testing-list',
-                $event->data['unsubscribeLink']);
+                $event->data['unsubscribeLink']
+            );
             $this->assertEquals(
                 'https://testing.local/unsubscribe',
                 $event->data['unsubscribeLinkForAll']

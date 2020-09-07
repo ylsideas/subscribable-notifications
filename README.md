@@ -1,13 +1,10 @@
 # Subscribable Notifications for Laravel
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/ylsideas/subscribable-notifications.svg?style=flat-square)](https://packagist.org/packages/ylsideas/subscribable-notifications)
-[![Build Status](https://img.shields.io/travis/ylsideas/subscribable-notifications/master.svg?style=flat-square)](https://travis-ci.org/ylsideas/subscribable-notifications)
-[![Quality Score](https://img.shields.io/scrutinizer/g/ylsideas/subscribable-notifications.svg?style=flat-square)](https://scrutinizer-ci.com/g/ylsideas/subscribable-notifications)
-[![Code Coverage](https://scrutinizer-ci.com/g/ylsideas/subscribable-notifications/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/ylsideas/subscribable-notifications/?branch=master)
+[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/ylsideas/subscribable-notifications/Tests?label=tests)](https://github.com/ylsideas/subscribable-notifications/actions?query=workflow%3ATests+branch%3Amaster)
 [![Total Downloads](https://img.shields.io/packagist/dt/ylsideas/subscribable-notifications.svg?style=flat-square)](https://packagist.org/packages/ylsideas/subscribable-notifications)
-[![StyleCI](https://github.styleci.io/repos/192806647/shield?branch=master)](https://github.styleci.io/repos/192806647)
 
-This package is designed to help you handle email unsubscribes with as little as 5 minutes setup. After installing
+This package has been designed to help you handle email unsubscribes with as little as 5 minutes setup. After installing
 your notifications sent over email should now be delivered with unsubscribe links in the footer and as a mail header
 which email clients can present to the user for quicker unsubscribing. It can also handle resolving the unsubscribing 
 of the user through a signed route/controller.

@@ -2,10 +2,12 @@
 
 namespace YlsIdeas\SubscribableNotifications\Events;
 
+use Illuminate\Foundation\Auth\User;
+
 class UserUnsubscribing
 {
     /**
-     * @var Authenticatable
+     * @var User
      */
     public $user;
     /**
