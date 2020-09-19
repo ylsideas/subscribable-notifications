@@ -2,6 +2,8 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/ylsideas/subscribable-notifications.svg?style=flat-square)](https://packagist.org/packages/ylsideas/subscribable-notifications)
 [![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/ylsideas/subscribable-notifications/Tests?label=tests)](https://github.com/ylsideas/subscribable-notifications/actions?query=workflow%3ATests+branch%3Amaster)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ylsideas/subscribable-notifications/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ylsideas/subscribable-notifications/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/ylsideas/subscribable-notifications/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/ylsideas/subscribable-notifications/?branch=master)
 [![Total Downloads](https://img.shields.io/packagist/dt/ylsideas/subscribable-notifications.svg?style=flat-square)](https://packagist.org/packages/ylsideas/subscribable-notifications)
 
 This package has been designed to help you handle email unsubscribes with as little as 5 minutes setup. After installing
