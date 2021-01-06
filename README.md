@@ -296,6 +296,16 @@ This will create a `resources/views/vendor/subscriber` folder containing both `h
 and `text.blade.php` which can be customised. These will then be the defaults used by the
 notification mail channel.
 
+### Customising the User Model
+
+If you are using a different User model than the one found in `app/Models/User.php` or 
+`app/Users.php` for Laravel 7 and earlier you can change this by calling. It's suggested you
+do this in the boot method of the `SubscriberServiceProvider`.
+
+```php
+Subscriber::userModel('App\Models\User');
+```
+
 ### Testing
 
 ``` bash

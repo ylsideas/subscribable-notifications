@@ -24,7 +24,7 @@ class Subscriber
     /**
      * @var string
      */
-    public $userModel = '\App\User';
+    public $userModel = '\App\Models\User';
     /**
      * @var callable
      */

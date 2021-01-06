@@ -14,7 +14,7 @@ abstract class SubscribableApplicationServiceProvider extends ServiceProvider
     /**
      * @var string
      */
-    protected $model = '\App\User';
+    protected $model = null;
 
     public function boot()
     {
@@ -22,7 +22,7 @@ abstract class SubscribableApplicationServiceProvider extends ServiceProvider
             $this->loadRoutes();
         }
 
-        \YlsIdeas\SubscribableNotifications\Facades\Subscriber::userModel($this->model);
+        \YlsIdeas\SubscribableNotifications\Facades\Subscriber::userModel($this->userModel());
 
         \YlsIdeas\SubscribableNotifications\Facades\Subscriber::onUnsubscribeFromMailingList(
             $this->onUnsubscribeFromMailingList()
@@ -39,6 +39,19 @@ abstract class SubscribableApplicationServiceProvider extends ServiceProvider
         \YlsIdeas\SubscribableNotifications\Facades\Subscriber::onCheckSubscriptionStatusOfAllMailingLists(
             $this->onCheckSubscriptionStatusOfAllMailingLists()
         );
+    }
+
+    protected function userModel()
+    {
+        if ($this->model != null) {
+            return $this->model;
+        }
+
+        if (version_compare($this->app->version(), '8.0.0', '>=')) {
+            return '\App\Models\User';
+        }
+
+        return '\App\User';
     }
 
     public function loadRoutes()
