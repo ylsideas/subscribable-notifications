@@ -13,6 +13,7 @@ use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiableWithSubscrip
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotification;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotificationWithMailingList;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotificationWithQueuing;
+use YlsIdeas\SubscribableNotifications\Tests\Support\DummyTransactionalNotification;
 
 class SubscriberMailChannelTest extends TestCase
 {
@@ -177,6 +178,40 @@ class SubscriberMailChannelTest extends TestCase
 
         $expectedNotification = new DummyNotification();
         $notifiable = new DummyNotifiable();
+
+        $notifiable->notify($expectedNotification);
+
+        Event::assertDispatched(MessageSending::class, function (MessageSending $event) {
+            $this->assertArrayNotHasKey('unsubscribeLinkForAll', $event->data);
+
+            $this->assertFalse(
+                $event->message->getHeaders()->has('List-Unsubscribe')
+            );
+
+            $this->assertStringNotContainsString(
+                'To no longer receive any future emails',
+                $event->message->getBody()
+            );
+
+            $this->assertStringNotContainsString(
+                'https://testing.local/unsubscribe',
+                $event->message->getBody()
+            );
+
+            return true;
+        });
+    }
+
+    /** @test */
+    public function it_sends_mail_notifications_normally_if_transactional()
+    {
+        Event::fake([
+            MessageSending::class,
+            MessageSent::class,
+        ]);
+
+        $expectedNotification = new DummyTransactionalNotification();
+        $notifiable = new DummyNotifiableWithSubscriptions();
 
         $notifiable->notify($expectedNotification);
 
