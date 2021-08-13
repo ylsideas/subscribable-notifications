@@ -306,6 +306,11 @@ do this in the boot method of the `SubscriberServiceProvider`.
 Subscriber::userModel('App\Models\User');
 ```
 
+### Exclude transactional emails
+
+Transactional emails like account creation mails, password resets or purchase receipts should always be delivered. By applying the `Transactional` trait, 
+the unsubscribe features are ignored.
+
 ### Testing
 
 ``` bash

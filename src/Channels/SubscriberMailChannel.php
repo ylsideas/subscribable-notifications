@@ -11,6 +11,7 @@ use YlsIdeas\SubscribableNotifications\Contracts\AppliesToMailingList;
 use YlsIdeas\SubscribableNotifications\Contracts\CanUnsubscribe;
 use YlsIdeas\SubscribableNotifications\Contracts\CheckNotifiableSubscriptionStatus;
 use YlsIdeas\SubscribableNotifications\Contracts\CheckSubscriptionStatusBeforeSendingNotifications;
+use YlsIdeas\SubscribableNotifications\Contracts\Transactional;
 
 class SubscriberMailChannel extends MailChannel
 {
@@ -32,7 +33,8 @@ class SubscriberMailChannel extends MailChannel
     public function send($notifiable, Notification $notification)
     {
         // Check if the user would want the mail
-        if ($notifiable instanceof CheckSubscriptionStatusBeforeSendingNotifications &&
+        if (!($notification instanceOf Transactional) &&
+            $notifiable instanceof CheckSubscriptionStatusBeforeSendingNotifications &&
             $notification instanceof CheckNotifiableSubscriptionStatus &&
             $notification->checkMailSubscriptionStatus() &&
             ! $notifiable->mailSubscriptionStatus($notification)) {
@@ -47,12 +49,15 @@ class SubscriberMailChannel extends MailChannel
 
         // Inject unsubscribe links for rendering in the view
         if ($notifiable instanceof CanUnsubscribe && $message instanceof MailMessage) {
-            if ($notification instanceof AppliesToMailingList) {
-                $message->viewData['unsubscribeLink'] = $notifiable->unsubscribeLink(
-                    $notification->usesMailingList()
-                );
+            if (! ($notification instanceOf Transactional)) {
+                if ($notification instanceof AppliesToMailingList) {
+                    $message->viewData['unsubscribeLink'] = $notifiable->unsubscribeLink(
+                        $notification->usesMailingList()
+                    );
+                }
+
+                $message->viewData['unsubscribeLinkForAll'] = $notifiable->unsubscribeLink();
             }
-            $message->viewData['unsubscribeLinkForAll'] = $notifiable->unsubscribeLink();
         }
 
         if (! $notifiable->routeNotificationFor('mail', $notification) &&
@@ -87,7 +92,7 @@ class SubscriberMailChannel extends MailChannel
     {
         parent::buildMessage($mailMessage, $notifiable, $notification, $message);
 
-        if ($notifiable instanceof CanUnsubscribe) {
+        if ($notifiable instanceof CanUnsubscribe && !($notification instanceof Transactional)) {
             $mailMessage->getHeaders()->addTextHeader(
                 'List-Unsubscribe',
                 sprintf('<%s>', $notifiable->unsubscribeLink(
