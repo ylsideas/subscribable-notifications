@@ -49,6 +49,8 @@ class UnsubscribeControllerTest extends TestCase
             'password' => 'test',
         ]);
 
+        Subscriber::userModel(DummyUser::class);
+
         Subscriber::onUnsubscribeFromAllMailingLists(
             function ($user) use (&$expected, $expectedUser) {
                 $expected = true;
@@ -76,6 +78,8 @@ class UnsubscribeControllerTest extends TestCase
             'email' => 'test@testing.local',
             'password' => 'test',
         ]);
+
+        Subscriber::userModel(DummyUser::class);
 
         Subscriber::onUnsubscribeFromMailingList(
             function ($user, $mailingList) use (&$expected, $expectedUser) {

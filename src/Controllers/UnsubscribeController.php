@@ -33,8 +33,7 @@ class UnsubscribeController extends Controller
      * Handle the incoming request.
      *
      * @param Request $request
-     *
-     * @param $subscriber
+     * @param mixed $subscriber
      * @param string|null $mailingList
      * @return Response
      */

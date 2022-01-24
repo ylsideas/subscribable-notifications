@@ -3,7 +3,6 @@
 namespace YlsIdeas\SubscribableNotifications\Channels;
 
 use Illuminate\Contracts\Mail\Mailable;
-use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -17,7 +16,7 @@ class SubscriberMailChannel extends MailChannel
     /**
      * The mailer implementation.
      *
-     * @var Mailer
+     * @var \Illuminate\Contracts\Mail\Factory
      */
     protected $mailer;
 
@@ -66,7 +65,7 @@ class SubscriberMailChannel extends MailChannel
             return;
         }
 
-        $this->mailer->send(
+        $this->mailer->mailer($message->mailer ?? null)->send(
             $this->buildView($message),
             array_merge($message->data(), $this->additionalMessageData($notification)),
             $this->messageBuilder($notifiable, $notification, $message)

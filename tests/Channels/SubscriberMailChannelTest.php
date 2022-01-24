@@ -7,6 +7,7 @@ use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\Mime\Email;
 use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiable;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiableWithSubscriptions;
@@ -54,27 +55,29 @@ class SubscriberMailChannelTest extends TestCase
             );
             $this->assertEquals(
                 '<https://testing.local/unsubscribe/testing-list>',
-                $event->message->getHeaders()->get('List-Unsubscribe')->getFieldBody()
+                $this->getHeaderContent($event->message, 'List-Unsubscribe')
             );
+
+            $content = $this->getContent($event->message);
 
             $this->assertStringContainsString(
                 'If you no longer want to receive this type of email in the future use this',
-                $event->message->getBody()
+                $content
             );
 
             $this->assertStringContainsString(
                 'To no longer receive any future emails',
-                $event->message->getBody()
+                $content
             );
 
             $this->assertStringContainsString(
                 'https://testing.local/unsubscribe/testing-list',
-                $event->message->getBody()
+                $content
             );
 
             $this->assertStringContainsString(
                 'https://testing.local/unsubscribe',
-                $event->message->getBody()
+                $content
             );
 
             return true;
@@ -105,19 +108,22 @@ class SubscriberMailChannelTest extends TestCase
             $this->assertTrue(
                 $event->message->getHeaders()->has('List-Unsubscribe')
             );
+
             $this->assertEquals(
                 '<https://testing.local/unsubscribe>',
-                $event->message->getHeaders()->get('List-Unsubscribe')->getFieldBody()
+                $this->getHeaderContent($event->message, 'List-Unsubscribe')
             );
+
+            $content = $this->getContent($event->message);
 
             $this->assertStringContainsString(
                 'To no longer receive any future emails',
-                $event->message->getBody()
+                $content
             );
 
             $this->assertStringContainsString(
                 'https://testing.local/unsubscribe',
-                $event->message->getBody()
+                $content
             );
 
             return true;
@@ -150,17 +156,19 @@ class SubscriberMailChannelTest extends TestCase
             );
             $this->assertEquals(
                 '<https://testing.local/unsubscribe>',
-                $event->message->getHeaders()->get('List-Unsubscribe')->getFieldBody()
+                $this->getHeaderContent($event->message, 'List-Unsubscribe')
             );
+
+            $content = $this->getContent($event->message);
 
             $this->assertStringContainsString(
                 'To no longer receive any future emails',
-                $event->message->getBody()
+                $content
             );
 
             $this->assertStringContainsString(
                 'https://testing.local/unsubscribe',
-                $event->message->getBody()
+                $content
             );
 
             return true;
@@ -187,14 +195,16 @@ class SubscriberMailChannelTest extends TestCase
                 $event->message->getHeaders()->has('List-Unsubscribe')
             );
 
+            $content = $this->getContent($event->message);
+
             $this->assertStringNotContainsString(
                 'To no longer receive any future emails',
-                $event->message->getBody()
+                $content
             );
 
             $this->assertStringNotContainsString(
                 'https://testing.local/unsubscribe',
-                $event->message->getBody()
+                $content,
             );
 
             return true;
@@ -218,9 +228,11 @@ class SubscriberMailChannelTest extends TestCase
         $notifiable->notify($expectedNotification);
 
         Event::assertDispatched(MessageSending::class, function (MessageSending $event) {
+            $content = $this->getContent($event->message);
+
             $this->assertStringContainsString(
                 'This is a dummy',
-                $event->message->getBody()
+                $content
             );
 
             return true;
@@ -280,12 +292,44 @@ class SubscriberMailChannelTest extends TestCase
         $notifiable->notify($expectedNotification);
 
         Event::assertDispatched(MessageSending::class, function (MessageSending $event) {
+            $content = $this->getContent($event->message);
+
             $this->assertStringContainsString(
                 'This is a dummy',
-                $event->message->getBody()
+                $content
             );
 
             return true;
         });
+    }
+
+    /**
+     * @param \Swift_Message|Email $message
+     * @return string
+     */
+    protected function getContent($message): string
+    {
+        if (get_class($message) === 'Swift_Message') {
+            return $message->getBody();
+        } elseif (get_class($message) === 'Symfony\Component\Mime\Email') {
+            return $message->getHtmlBody();
+        }
+
+        throw new \Exception(sprintf('Could not establish Message class %s', get_class($message)));
+    }
+
+    /**
+     * @param \Swift_Message|Email $message
+     * @return string
+     */
+    protected function getHeaderContent($message, $header): string
+    {
+        if (get_class($message) === 'Swift_Message') {
+            return $message->getHeaders()->get($header, 0)->getValue();
+        } elseif (get_class($message) === 'Symfony\Component\Mime\Email') {
+            return $message->getHeaders()->getHeaderBody($header);
+        }
+
+        throw new \Exception(sprintf('Could not establish Message class %s', get_class($message)));
     }
 }

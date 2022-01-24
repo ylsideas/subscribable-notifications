@@ -135,7 +135,7 @@ class Subscriber
     }
 
     /**
-     * @param $user
+     * @param mixed $user
      * @param string $mailingList
      */
     public function unsubscribeFromMailingList($user, string $mailingList)
@@ -144,7 +144,7 @@ class Subscriber
     }
 
     /**
-     * @param $user
+     * @param mixed $user
      */
     public function unsubscribeFromAllMailingLists($user)
     {
@@ -152,7 +152,7 @@ class Subscriber
     }
 
     /**
-     * @param $user
+     * @param mixed $user
      * @param string|null $mailingList
      * @return Response
      */
@@ -162,7 +162,7 @@ class Subscriber
     }
 
     /**
-     * @param $user
+     * @param mixed $user
      * @param string|null $mailingList
      * @return bool
      */
