@@ -20,7 +20,7 @@ jobs:
                     coverage: pcov
 
             - name: Cache composer dependencies
-              uses: actions/cache@v1
+              uses: actions/cache@v2.1.7
               with:
                   path: vendor
                   key: composer-${{ hashFiles('composer.lock') }}
