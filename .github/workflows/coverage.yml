@@ -6,8 +6,8 @@ on:
             - master
 
 jobs:
-    psalm:
-        name: psalm
+    coverage:
+        name: coverage
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
@@ -15,7 +15,7 @@ jobs:
             -   name: Setup PHP with PCOV
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: '8.1'
+                    php-version: '8.0'
                     extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
                     coverage: pcov
 
