@@ -1,7 +1,7 @@
 # Subscribable Notifications for Laravel
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/ylsideas/subscribable-notifications.svg?style=flat-square)](https://packagist.org/packages/ylsideas/subscribable-notifications)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/ylsideas/subscribable-notifications/Tests?label=tests)](https://github.com/ylsideas/subscribable-notifications/actions?query=workflow%3ATests+branch%3Amaster)
+[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/ylsideas/subscribable-notifications/run-tests?label=tests)](https://github.com/ylsideas/subscribable-notifications/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/ylsideas/subscribable-notifications/Check%20&%20fix%20styling?label=code%20style)](https://github.com/ylsideas/subscribable-notifications/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/ylsideas/subscribable-notifications.svg?style=flat-square)](https://packagist.org/packages/ylsideas/subscribable-notifications)
 
