@@ -33,15 +33,9 @@ class SubscribableServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind(MailChannel::class, SubscriberMailChannel::class);
-        if (method_exists($this->app, 'scoped')) {
-            $this->app->scoped(Subscriber::class, function (Application $app) {
-                return new Subscriber($app);
-            });
-        } else {
-            $this->app->singleton(Subscriber::class, function (Application $app) {
-                /** @phpstan-ignore-next-line */
-                return new Subscriber($app);
-            });
-        }
+        $this->app->singleton(Subscriber::class, function (Application $app) {
+            /** @phpstan-ignore-next-line */
+            return new Subscriber($app);
+        });
     }
 }
