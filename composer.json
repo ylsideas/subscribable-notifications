@@ -18,12 +18,11 @@
     ],
     "require": {
         "php": "^8.2",
-        "illuminate/contracts": "^10.0|^11.0"
+        "illuminate/contracts": "11.*|10.*"
     },
     "require-dev": {
         "orchestra/testbench": "^8.0|^9.0",
-        "phpunit/phpunit": "^9.5.10|^10.5",
-        "nunomaduro/collision": "^6.0|^8.0",
+        "nunomaduro/collision": "^8.0|^7.8|^6.0",
         "larastan/larastan": "^2.0",
         "pestphp/pest": "^2.34",
         "pestphp/pest-plugin-laravel": "^2.3",
