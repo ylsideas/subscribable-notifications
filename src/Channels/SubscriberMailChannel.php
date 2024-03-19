@@ -25,8 +25,7 @@ class SubscriberMailChannel extends MailChannel
      *
      * @param mixed $notifiable
      * @param \Illuminate\Notifications\Notification $notification
-     *
-     * @return void
+     * @return \Illuminate\Mail\SentMessage|null
      */
     public function send($notifiable, Notification $notification)
     {
@@ -35,7 +34,7 @@ class SubscriberMailChannel extends MailChannel
             $notification instanceof CheckNotifiableSubscriptionStatus &&
             $notification->checkMailSubscriptionStatus() &&
             ! $notifiable->mailSubscriptionStatus($notification)) {
-            return;
+            return null;
         }
 
         if (method_exists($notification, 'toMail')) {
@@ -56,16 +55,16 @@ class SubscriberMailChannel extends MailChannel
 
         if (! $notifiable->routeNotificationFor('mail', $notification) &&
             ! $message instanceof Mailable) {
-            return;
+            return null;
         }
 
         if ($message instanceof Mailable) {
             $message->send($this->mailer);
 
-            return;
+            return null;
         }
 
-        $this->mailer->mailer($message->mailer ?? null)->send(
+        return $this->mailer->mailer($message->mailer ?? null)->send(
             $this->buildView($message),
             array_merge($message->data(), $this->additionalMessageData($notification)),
             $this->messageBuilder($notifiable, $notification, $message)

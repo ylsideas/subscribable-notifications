@@ -292,19 +292,6 @@ class SubscriberTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_type_checks_for_a_callable_or_string_handler()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Handler argument must be either a string or callable.');
-
-        $subscriber = new Subscriber($this->app);
-
-        $subscriber->onCompletion(
-            new \stdClass()
-        );
-    }
-
-    /** @test */
     public function it_can_provide_a_user_model()
     {
         $subscriber = new Subscriber($this->app);

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @method static void routes()
  * @method static string routeName()
- * @method static userModel(string $model = null)
+ * @method static mixed userModel(string $model = null)
  * @method static void onCompletion(callable|string $handler)
  * @method static void onUnsubscribeFromMailingList(callable|string $handler)
  * @method static void onUnsubscribeFromAllMailingLists(callable|string $handler)
