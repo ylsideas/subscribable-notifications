@@ -5,7 +5,6 @@ namespace YlsIdeas\SubscribableNotifications;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
-use InvalidArgumentException;
 
 class Subscriber
 {
