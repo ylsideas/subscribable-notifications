@@ -22,7 +22,9 @@ abstract class SubscribableApplicationServiceProvider extends ServiceProvider
             $this->loadRoutes();
         }
 
-        \YlsIdeas\SubscribableNotifications\Facades\Subscriber::userModel($this->userModel());
+        \YlsIdeas\SubscribableNotifications\Facades\Subscriber::userModel(
+            $this->userModel()
+        );
 
         \YlsIdeas\SubscribableNotifications\Facades\Subscriber::onUnsubscribeFromMailingList(
             $this->onUnsubscribeFromMailingList()

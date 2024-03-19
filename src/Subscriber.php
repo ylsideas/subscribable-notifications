@@ -176,22 +176,15 @@ class Subscriber
         return (bool) call_user_func($this->onCheckSubscriptionStatusForAllMailingLists, $user);
     }
 
-    /**
-     * @param string|callable $handler
-     * @return callable
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     */
-    protected function parseHandler($handler)
+    protected function parseHandler(string|callable$handler): callable
     {
         if (is_string($handler)) {
             $parsed = Str::parseCallback($handler);
             $parsed[0] = $this->app->make($parsed[0]);
 
             return $parsed;
-        } elseif (is_callable($handler)) {
-            return $handler;
         }
 
-        throw new InvalidArgumentException('Handler argument must be either a string or callable.');
+        return $handler;
     }
 }
