@@ -3,6 +3,7 @@
 namespace YlsIdeas\SubscribableNotifications\Tests;
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use Orchestra\Testbench\TestCase;
 use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
 use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
@@ -45,8 +46,9 @@ class MailSubscriberTest extends TestCase
 
         $url = $user->unsubscribeLink();
 
+
         $this->assertEquals(
-            'http://localhost/unsubscribe/1?signature=bcc7b9f9909fb5f427f1b55022ee44eafee3d655a449f48d2e751748e1a9bcdf',
+            URL::signedRoute('unsubscribe', ['subscriber' => 1]),
             $url
         );
     }
@@ -68,7 +70,7 @@ class MailSubscriberTest extends TestCase
         $url = $user->unsubscribeLink('test');
 
         $this->assertEquals(
-            'http://localhost/unsubscribe/1/test?signature=edaf5bee199875521054535be04273c5006e4d6d834c98a83a3aa16a92223814',
+            URL::signedRoute('unsubscribe', ['subscriber' => 1, 'mailingList' => 'test']),
             $url
         );
     }
