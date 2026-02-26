@@ -18,14 +18,14 @@
     ],
     "require": {
         "php": "^8.2",
-        "illuminate/contracts": "12.*|11.*|10.*"
+        "illuminate/contracts": "12.*|11.*|10.*|^13.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^8.0|^9.0|^10.0",
+        "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
         "nunomaduro/collision": "^8.0|^7.8|^6.0",
-        "larastan/larastan": "^2.0|^3.0",
-        "pestphp/pest": "^2.34|^3.0",
-        "pestphp/pest-plugin-laravel": "^2.3|^3.0",
+        "larastan/larastan": "^2.0|^3.0|dev-l13",
+        "pestphp/pest": "^2.34|^3.0|^4.4",
+        "pestphp/pest-plugin-laravel": "^2.3|^3.0|^4.1",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^1.0|^2.0",
         "phpstan/phpstan-phpunit": "^1.0|^2.0",
