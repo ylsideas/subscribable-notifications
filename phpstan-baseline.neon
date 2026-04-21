@@ -1,0 +1,7 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Trait YlsIdeas\\SubscribableNotifications\\MailSubscriber is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/MailSubscriber.php
