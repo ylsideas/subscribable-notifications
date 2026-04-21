@@ -8,8 +8,7 @@ use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiable;
 
 class UserUnsubscribingTest extends TestCase
 {
-    /** @test */
-    public function it_can_be_initialised_with_parameters()
+    public function test_it_can_be_initialised_with_parameters()
     {
         $user = new DummyNotifiable();
 

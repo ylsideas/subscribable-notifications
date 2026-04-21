@@ -21,8 +21,7 @@ class SubscribableServiceProviderTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
-    public function it_can_publish_views()
+    public function test_it_can_publish_views()
     {
         $this->assertFalse(File::exists(resource_path('views/vendor/subscriber')));
 
@@ -34,8 +33,7 @@ class SubscribableServiceProviderTest extends TestCase
         $this->assertTrue(File::exists(resource_path('views/vendor/subscriber')));
     }
 
-    /** @test */
-    public function it_loads_views()
+    public function test_it_loads_views()
     {
         $this->app->register(SubscribableServiceProvider::class);
 
@@ -43,8 +41,7 @@ class SubscribableServiceProviderTest extends TestCase
         $this->assertTrue(View::exists('subscriber::text'));
     }
 
-    /** @test */
-    public function it_can_publish_an_application_service_provider()
+    public function test_it_can_publish_an_application_service_provider()
     {
         $this->assertFalse(File::exists(app_path('Providers/SubscribableServiceProvider.php')));
 
