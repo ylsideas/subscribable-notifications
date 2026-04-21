@@ -8,8 +8,7 @@ use YlsIdeas\SubscribableNotifications\Tests\Support\DummyApplicationServiceProv
 
 class SubscribeApplicationServiceProviderTest extends TestCase
 {
-    /** @test */
-    public function it_can_be_configured_to_loads_routes()
+    public function test_it_can_be_configured_to_loads_routes()
     {
         Subscriber::shouldReceive('routes');
         Subscriber::shouldReceive('userModel');
@@ -25,8 +24,7 @@ class SubscribeApplicationServiceProviderTest extends TestCase
         $provider->boot();
     }
 
-    /** @test */
-    public function it_can_be_configured_to_not_loads_routes()
+    public function test_it_can_be_configured_to_not_loads_routes()
     {
         Subscriber::shouldReceive('routes')->never();
         Subscriber::shouldReceive('userModel');

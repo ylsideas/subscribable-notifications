@@ -24,8 +24,7 @@ class SubscriberMailChannelTest extends TestCase
         ];
     }
 
-    /** @test */
-    public function it_sends_mail_notifications_with_unsubscribe_links_for_mailing_lists()
+    public function test_it_sends_mail_notifications_with_unsubscribe_links_for_mailing_lists()
     {
         Event::fake([
             MessageSending::class,
@@ -84,8 +83,7 @@ class SubscriberMailChannelTest extends TestCase
         });
     }
 
-    /** @test */
-    public function it_sends_mail_notifications_with_mailing_links_via_queues()
+    public function test_it_sends_mail_notifications_with_mailing_links_via_queues()
     {
         Event::fake([
             MessageSending::class,
@@ -130,8 +128,7 @@ class SubscriberMailChannelTest extends TestCase
         });
     }
 
-    /** @test */
-    public function it_sends_mail_notifications_with_an_unsubscribe_link_for_all_emails()
+    public function test_it_sends_mail_notifications_with_an_unsubscribe_link_for_all_emails()
     {
         Event::fake([
             MessageSending::class,
@@ -175,8 +172,7 @@ class SubscriberMailChannelTest extends TestCase
         });
     }
 
-    /** @test */
-    public function it_sends_mail_notifications_normally_otherwise()
+    public function test_it_sends_mail_notifications_normally_otherwise()
     {
         Event::fake([
             MessageSending::class,
@@ -211,8 +207,7 @@ class SubscriberMailChannelTest extends TestCase
         });
     }
 
-    /** @test */
-    public function it_handles_mailables_as_per_inherited_behavior()
+    public function test_it_handles_mailables_as_per_inherited_behavior()
     {
         View::addNamespace('testing', __DIR__.'/../views');
 
@@ -239,8 +234,7 @@ class SubscriberMailChannelTest extends TestCase
         });
     }
 
-    /** @test */
-    public function it_checks_if_a_notifiable_is_subscribed_to_receive_the_notification()
+    public function test_it_checks_if_a_notifiable_is_subscribed_to_receive_the_notification()
     {
         Event::fake([
             MessageSending::class,
@@ -258,8 +252,7 @@ class SubscriberMailChannelTest extends TestCase
         Event::assertNotDispatched(MessageSending::class);
     }
 
-    /** @test */
-    public function it_does_not_send_mail_if_there_is_no_email_to_route_to()
+    public function test_it_does_not_send_mail_if_there_is_no_email_to_route_to()
     {
         Event::fake([
             MessageSending::class,
@@ -275,8 +268,7 @@ class SubscriberMailChannelTest extends TestCase
         Event::assertNotDispatched(MessageSending::class);
     }
 
-    /** @test */
-    public function it_uses_views_set_on_the_mail_message_from_the_notification()
+    public function test_it_uses_views_set_on_the_mail_message_from_the_notification()
     {
         View::addNamespace('testing', __DIR__.'/../views');
 

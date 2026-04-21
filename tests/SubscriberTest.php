@@ -23,8 +23,7 @@ class SubscriberTest extends TestCase
         ];
     }
 
-    /** @test */
-    public function it_handles_unsubscribing_from_all_mailing_lists_via_closure()
+    public function test_it_handles_unsubscribing_from_all_mailing_lists_via_closure()
     {
         $subscriber = new Subscriber($this->app);
 
@@ -42,8 +41,7 @@ class SubscriberTest extends TestCase
         $this->assertTrue($expected);
     }
 
-    /** @test */
-    public function it_handles_unsubscribing_from_all_mailing_lists_via_string()
+    public function test_it_handles_unsubscribing_from_all_mailing_lists_via_string()
     {
         $subscriber = new Subscriber($this->app);
         $dummy = \Mockery::mock();
@@ -65,8 +63,7 @@ class SubscriberTest extends TestCase
         $subscriber->unsubscribeFromAllMailingLists($expectedUser);
     }
 
-    /** @test */
-    public function it_handles_unsubscribing_from_a_mailing_list_via_closure()
+    public function test_it_handles_unsubscribing_from_a_mailing_list_via_closure()
     {
         $subscriber = new Subscriber($this->app);
 
@@ -88,8 +85,7 @@ class SubscriberTest extends TestCase
         $this->assertTrue($expected);
     }
 
-    /** @test */
-    public function it_handles_unsubscribing_from_a_mailing_list_via_string()
+    public function test_it_handles_unsubscribing_from_a_mailing_list_via_string()
     {
         $subscriber = new Subscriber($this->app);
         $dummy = \Mockery::mock();
@@ -112,8 +108,7 @@ class SubscriberTest extends TestCase
         $subscriber->unsubscribeFromMailingList($expectedUser, $expectedMailingList);
     }
 
-    /** @test */
-    public function it_handles_generating_a_response_for_unsubscribing_via_closure()
+    public function test_it_handles_generating_a_response_for_unsubscribing_via_closure()
     {
         $subscriber = new Subscriber($this->app);
 
@@ -138,8 +133,7 @@ class SubscriberTest extends TestCase
         $this->assertTrue($expected);
     }
 
-    /** @test */
-    public function it_handles_generating_a_response_for_unsubscribing_via_string()
+    public function test_it_handles_generating_a_response_for_unsubscribing_via_string()
     {
         $subscriber = new Subscriber($this->app);
         $dummy = \Mockery::mock();
@@ -164,8 +158,7 @@ class SubscriberTest extends TestCase
         $this->assertInstanceOf(Response::class, $response);
     }
 
-    /** @test */
-    public function it_handles_checking_subscription_status_of_a_mailing_list_via_closure()
+    public function test_it_handles_checking_subscription_status_of_a_mailing_list_via_closure()
     {
         $subscriber = new Subscriber($this->app);
 
@@ -201,8 +194,7 @@ class SubscriberTest extends TestCase
         $this->assertTrue($expectedSecond);
     }
 
-    /** @test */
-    public function it_handles_checking_subscription_status_of_a_mailing_list_via_string()
+    public function test_it_handles_checking_subscription_status_of_a_mailing_list_via_string()
     {
         $subscriber = new Subscriber($this->app);
         $dummy = \Mockery::mock();
@@ -235,8 +227,7 @@ class SubscriberTest extends TestCase
         $this->assertTrue($subscriber->checkSubscriptionStatus($expectedUser, $expectedMailingList));
     }
 
-    /** @test */
-    public function it_handles_checking_subscription_status_of_all_mailing_lists_via_closure()
+    public function test_it_handles_checking_subscription_status_of_all_mailing_lists_via_closure()
     {
         $subscriber = new Subscriber($this->app);
 
@@ -257,8 +248,7 @@ class SubscriberTest extends TestCase
         $this->assertTrue($expected);
     }
 
-    /** @test */
-    public function it_handles_checking_subscription_status_of_all_mailing_lists_via_string()
+    public function test_it_handles_checking_subscription_status_of_all_mailing_lists_via_string()
     {
         $subscriber = new Subscriber($this->app);
         $dummy = \Mockery::mock();
@@ -291,8 +281,7 @@ class SubscriberTest extends TestCase
         $this->assertTrue($subscriber->checkSubscriptionStatus($expectedUser));
     }
 
-    /** @test */
-    public function it_can_provide_a_user_model()
+    public function test_it_can_provide_a_user_model()
     {
         $subscriber = new Subscriber($this->app);
         $subscriber->userModel = \YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser::class;
@@ -303,8 +292,7 @@ class SubscriberTest extends TestCase
         );
     }
 
-    /** @test */
-    public function it_can_configure_a_user_model()
+    public function test_it_can_configure_a_user_model()
     {
         $subscriber = new Subscriber($this->app);
         $subscriber->userModel(\YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser::class);
@@ -315,8 +303,7 @@ class SubscriberTest extends TestCase
         );
     }
 
-    /** @test */
-    public function it_can_configure_a_route_for_the_unsubscribe_controller()
+    public function test_it_can_configure_a_route_for_the_unsubscribe_controller()
     {
         $subscriber = new Subscriber($this->app);
 

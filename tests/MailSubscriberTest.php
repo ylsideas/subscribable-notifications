@@ -30,8 +30,7 @@ class MailSubscriberTest extends TestCase
         ];
     }
 
-    /** @test */
-    public function it_generates_a_signed_url_for_users_to_unsubscribe()
+    public function test_it_generates_a_signed_url_for_users_to_unsubscribe()
     {
         Route::get('unsubscribe/{subscriber}/{mailingList?}', function () {
         })->name('unsubscribe');
@@ -53,8 +52,7 @@ class MailSubscriberTest extends TestCase
         );
     }
 
-    /** @test */
-    public function it_generates_a_signed_url_for_users_to_unsubscribe_from_a_mailing_list()
+    public function test_it_generates_a_signed_url_for_users_to_unsubscribe_from_a_mailing_list()
     {
         Route::get('unsubscribe/{subscriber}/{mailingList?}', function () {
         })->name('unsubscribe');
@@ -75,8 +73,7 @@ class MailSubscriberTest extends TestCase
         );
     }
 
-    /** @test */
-    public function it_can_check_its_subscription_status_for_all_mailing_lists()
+    public function test_it_can_check_its_subscription_status_for_all_mailing_lists()
     {
         /** @var DummyUser $user */
         $user = DummyUser::make([
@@ -94,8 +91,7 @@ class MailSubscriberTest extends TestCase
         $this->assertTrue($user->mailSubscriptionStatus($notification));
     }
 
-    /** @test */
-    public function it_can_check_its_subscription_status_for_one_mailing_list()
+    public function test_it_can_check_its_subscription_status_for_one_mailing_list()
     {
         /** @var DummyUser $user */
         $user = DummyUser::make([

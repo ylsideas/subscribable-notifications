@@ -35,8 +35,7 @@ class UnsubscribeControllerTest extends TestCase
         ];
     }
 
-    /** @test */
-    public function it_unsubscribes_users_from_all_mailing_lists()
+    public function test_it_unsubscribes_users_from_all_mailing_lists()
     {
         $this->withoutExceptionHandling();
 
@@ -65,8 +64,7 @@ class UnsubscribeControllerTest extends TestCase
         $this->assertTrue($expected);
     }
 
-    /** @test */
-    public function it_unsubscribes_users_from_a_mailing_list()
+    public function test_it_unsubscribes_users_from_a_mailing_list()
     {
         $this->withoutExceptionHandling();
 
@@ -96,8 +94,7 @@ class UnsubscribeControllerTest extends TestCase
         $this->assertTrue($expected);
     }
 
-    /** @test */
-    public function it_uses_the_subscriber_to_redirect_the_user_after_completion()
+    public function test_it_uses_the_subscriber_to_redirect_the_user_after_completion()
     {
         $this->withoutExceptionHandling();
 
@@ -127,8 +124,7 @@ class UnsubscribeControllerTest extends TestCase
         $this->assertTrue($expected);
     }
 
-    /** @test */
-    public function it_aborts_if_the_target_model_does_not_exist()
+    public function test_it_aborts_if_the_target_model_does_not_exist()
     {
         $notExpected = false;
 
@@ -149,8 +145,7 @@ class UnsubscribeControllerTest extends TestCase
         $this->assertFalse($notExpected);
     }
 
-    /** @test */
-    public function it_fires_events_for_unsubscribing()
+    public function test_it_fires_events_for_unsubscribing()
     {
         $this->withoutExceptionHandling();
 

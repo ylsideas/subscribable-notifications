@@ -17,15 +17,15 @@
         }
     ],
     "require": {
-        "php": "^8.2",
-        "illuminate/contracts": "12.*|11.*|10.*"
+        "php": "^8.3",
+        "illuminate/contracts": "13.*|12.*|11.*"
     },
     "require-dev": {
-        "orchestra/testbench": "^8.0|^9.0|^10.0",
-        "nunomaduro/collision": "^8.0|^7.8|^6.0",
+        "orchestra/testbench": "^9.17.0|^10.0|^11.0",
+        "nunomaduro/collision": "^8.0",
         "larastan/larastan": "^2.0|^3.0",
-        "pestphp/pest": "^2.34|^3.0",
-        "pestphp/pest-plugin-laravel": "^2.3|^3.0",
+        "pestphp/pest": "^2.34|^3.0|^4.0",
+        "pestphp/pest-plugin-laravel": "^2.3|^3.0|^4.0",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^1.0|^2.0",
         "phpstan/phpstan-phpunit": "^1.0|^2.0",
@@ -43,8 +43,8 @@
     },
     "scripts": {
         "analyse": "vendor/bin/phpstan analyse",
-        "test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest coverage"
+        "test": "vendor/bin/pest --no-coverage",
+        "test-coverage": "vendor/bin/pest"
     },
     "config": {
         "sort-packages": true,
