@@ -11,9 +11,11 @@ class DummyApplicationServiceProvider extends ServiceProvider
     {
         Subscriber::routes();
 
-        Subscriber::onUnsubscribeFromMailingList(function () {});
+        Subscriber::onUnsubscribeFromMailingList(function () {
+        });
 
-        Subscriber::onUnsubscribeFromAllMailingLists(function () {});
+        Subscriber::onUnsubscribeFromAllMailingLists(function () {
+        });
 
         Subscriber::onCompletion(function () {
             return redirect('/');
