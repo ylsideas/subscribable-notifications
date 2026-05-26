@@ -19,8 +19,8 @@ The unsubscribe route accepts `GET` (browser link) and `POST` (one-click from em
 
 ## Requirements
 
-- PHP 8.3+
-- Laravel 11, 12, or 13
+- PHP 8.4+
+- Laravel 12 or 13
 
 ## Installation
 
