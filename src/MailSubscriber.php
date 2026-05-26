@@ -13,11 +13,15 @@ trait MailSubscriber
      * @param string|null $mailingList
      * @return string
      */
-    public function unsubscribeLink(?string $mailingList = ''): string
+    public function unsubscribeLink(?string $mailingList = null): string
     {
         return URL::signedRoute(
             Subscriber::routeName(),
-            ['subscriber' => $this, 'mailingList' => $mailingList]
+            [
+                'subscriberType' => $this->getMorphClass(),
+                'subscriberId' => $this->getRouteKey(),
+                'mailingList' => $mailingList,
+            ]
         );
     }
 

@@ -7,8 +7,6 @@ use PHPUnit\Framework\Assert;
 
 class FakeSubscriber
 {
-    public string $userModel = '\App\Models\User';
-
     public string $routeName = 'unsubscribe';
 
     protected array $unsubscribedFromMailingList = [];
@@ -22,17 +20,6 @@ class FakeSubscriber
     public function routeName(): string
     {
         return $this->routeName;
-    }
-
-    public function userModel(?string $model = null): ?string
-    {
-        if ($model) {
-            $this->userModel = $model;
-
-            return null;
-        }
-
-        return $this->userModel;
     }
 
     public function onUnsubscribeFromMailingList($handler): void {}

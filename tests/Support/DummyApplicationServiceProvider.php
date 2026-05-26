@@ -6,8 +6,6 @@ use YlsIdeas\SubscribableNotifications\SubscribableApplicationServiceProvider;
 
 class DummyApplicationServiceProvider extends SubscribableApplicationServiceProvider
 {
-    protected $model = DummyUser::class;
-
     protected $loadRoutes = true;
 
     public function shouldLoadRoutes($shouldLoad = false)

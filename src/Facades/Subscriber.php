@@ -13,7 +13,6 @@ use YlsIdeas\SubscribableNotifications\Testing\FakeSubscriber;
  *
  * @method static void routes()
  * @method static string routeName()
- * @method static mixed userModel(string $model = null)
  * @method static void onCompletion(callable|string $handler)
  * @method static void onUnsubscribeFromMailingList(callable|string $handler)
  * @method static void onUnsubscribeFromAllMailingLists(callable|string $handler)

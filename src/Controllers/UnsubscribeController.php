@@ -2,9 +2,11 @@
 
 namespace YlsIdeas\SubscribableNotifications\Controllers;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use YlsIdeas\SubscribableNotifications\Contracts\CanUnsubscribe;
 use YlsIdeas\SubscribableNotifications\Events\UserUnsubscribed;
 use YlsIdeas\SubscribableNotifications\Events\UserUnsubscribing;
 use YlsIdeas\SubscribableNotifications\Subscriber;
@@ -33,16 +35,23 @@ class UnsubscribeController extends Controller
      * Handle the incoming request.
      *
      * @param Request $request
-     * @param mixed $subscriber
+     * @param string $subscriberType
+     * @param mixed $subscriberId
      * @param string|null $mailingList
      * @return Response
      */
-    public function __invoke(Request $request, $subscriber, ?string $mailingList = null)
+    public function __invoke(Request $request, string $subscriberType, $subscriberId, ?string $mailingList = null)
     {
-        $model = new $this->subscriber->userModel();
+        $modelClass = Relation::getMorphedModel($subscriberType) ?? $subscriberType;
+
+        if (! class_exists($modelClass) || ! is_a($modelClass, CanUnsubscribe::class, true)) {
+            abort(403, __('Could not process unsubscribe request'));
+        }
+
+        $model = new $modelClass();
 
         $subscriber = $model
-            ->where($model->getRouteKeyName(), $subscriber)
+            ->where($model->getRouteKeyName(), $subscriberId)
             ->first();
 
         if (! $subscriber) {

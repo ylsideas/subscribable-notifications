@@ -32,7 +32,7 @@ class MailSubscriberTest extends TestCase
 
     public function test_it_generates_a_signed_url_for_users_to_unsubscribe()
     {
-        Route::get('unsubscribe/{subscriber}/{mailingList?}', function () {
+        Route::get('unsubscribe/{subscriberType}/{subscriberId}/{mailingList?}', function () {
         })->name('unsubscribe');
 
         /** @var DummyUser $user */
@@ -45,16 +45,18 @@ class MailSubscriberTest extends TestCase
 
         $url = $user->unsubscribeLink();
 
-
         $this->assertEquals(
-            URL::signedRoute('unsubscribe', ['subscriber' => 1]),
+            URL::signedRoute('unsubscribe', [
+                'subscriberType' => $user->getMorphClass(),
+                'subscriberId' => 1,
+            ]),
             $url
         );
     }
 
     public function test_it_generates_a_signed_url_for_users_to_unsubscribe_from_a_mailing_list()
     {
-        Route::get('unsubscribe/{subscriber}/{mailingList?}', function () {
+        Route::get('unsubscribe/{subscriberType}/{subscriberId}/{mailingList?}', function () {
         })->name('unsubscribe');
 
         /** @var DummyUser $user */
@@ -68,7 +70,11 @@ class MailSubscriberTest extends TestCase
         $url = $user->unsubscribeLink('test');
 
         $this->assertEquals(
-            URL::signedRoute('unsubscribe', ['subscriber' => 1, 'mailingList' => 'test']),
+            URL::signedRoute('unsubscribe', [
+                'subscriberType' => $user->getMorphClass(),
+                'subscriberId' => 1,
+                'mailingList' => 'test',
+            ]),
             $url
         );
     }

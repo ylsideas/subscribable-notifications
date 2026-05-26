@@ -281,28 +281,6 @@ class SubscriberTest extends TestCase
         $this->assertTrue($subscriber->checkSubscriptionStatus($expectedUser));
     }
 
-    public function test_it_can_provide_a_user_model()
-    {
-        $subscriber = new Subscriber($this->app);
-        $subscriber->userModel = \YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser::class;
-
-        $this->assertEquals(
-            \YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser::class,
-            $subscriber->userModel()
-        );
-    }
-
-    public function test_it_can_configure_a_user_model()
-    {
-        $subscriber = new Subscriber($this->app);
-        $subscriber->userModel(\YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser::class);
-
-        $this->assertEquals(
-            \YlsIdeas\SubscribableNotifications\Tests\Support\DummyUser::class,
-            $subscriber->userModel
-        );
-    }
-
     public function test_it_can_configure_a_route_for_the_unsubscribe_controller()
     {
         $subscriber = new Subscriber($this->app);
@@ -316,6 +294,6 @@ class SubscriberTest extends TestCase
         $this->assertTrue($router->getRoutes()->hasNamedRoute('unsubscribe'));
         /** @var \Illuminate\Routing\Route $route */
         $route = $router->getRoutes()->getByName('unsubscribe');
-        $this->assertEquals($route->uri, 'unsubscribe/{subscriber}/{mailingList?}');
+        $this->assertEquals($route->uri, 'unsubscribe/{subscriberType}/{subscriberId}/{mailingList?}');
     }
 }

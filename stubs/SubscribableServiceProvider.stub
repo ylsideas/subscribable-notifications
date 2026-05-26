@@ -6,9 +6,6 @@ use YlsIdeas\SubscribableNotifications\SubscribableApplicationServiceProvider;
 
 class SubscribableServiceProvider extends SubscribableApplicationServiceProvider
 {
-    /**
-     * @var bool
-     */
     protected $loadRoutes = true;
 
     /**

@@ -11,7 +11,7 @@ class Subscriber
     /**
      * @var string
      */
-    public $uri = 'unsubscribe/{subscriber}/{mailingList?}';
+    public $uri = 'unsubscribe/{subscriberType}/{subscriberId}/{mailingList?}';
     /**
      * @var string
      */
@@ -20,10 +20,6 @@ class Subscriber
      * @var string
      */
     public $routeName = 'unsubscribe';
-    /**
-     * @var string
-     */
-    public $userModel = '\App\Models\User';
     /**
      * @var callable
      */
@@ -72,21 +68,6 @@ class Subscriber
     public function routeName()
     {
         return $this->routeName;
-    }
-
-    /**
-     * @param string|null $model
-     * @return string|null
-     */
-    public function userModel(?string $model = null)
-    {
-        if ($model) {
-            $this->userModel = $model;
-
-            return null;
-        }
-
-        return $this->userModel;
     }
 
     /**
