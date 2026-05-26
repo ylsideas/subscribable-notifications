@@ -27,11 +27,13 @@ trait MailSubscriber
      */
     public function mailSubscriptionStatus(Notification $notification): bool
     {
+        $list = $notification instanceof AppliesToMailingList
+            ? $notification->usesMailingList()
+            : null;
+
         return Subscriber::checkSubscriptionStatus(
             $this,
-            $notification instanceof AppliesToMailingList
-                ? $notification->usesMailingList()
-                : null
+            $list instanceof \BackedEnum ? $list->value : $list
         );
     }
 }

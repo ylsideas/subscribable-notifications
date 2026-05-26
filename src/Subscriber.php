@@ -58,7 +58,8 @@ class Subscriber
     public function routes($router = null)
     {
         $router = $router ?? $this->app->make('router');
-        $router->get(
+        $router->match(
+            ['GET', 'POST'],
             $this->uri,
             $this->hander
         )

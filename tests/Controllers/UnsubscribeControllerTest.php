@@ -165,4 +165,53 @@ class UnsubscribeControllerTest extends TestCase
         Event::assertDispatched(UserUnsubscribing::class);
         Event::assertDispatched(UserUnsubscribed::class);
     }
+
+    public function test_it_returns_200_for_rfc8058_one_click_post_unsubscribe()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var DummyUser $user */
+        $expectedUser = DummyUser::create([
+            'name' => 'test',
+            'email' => 'test@testing.local',
+            'password' => 'test',
+        ]);
+
+        Subscriber::userModel(DummyUser::class);
+
+        $called = false;
+        Subscriber::onUnsubscribeFromAllMailingLists(function ($user) use (&$called) {
+            $called = true;
+        });
+
+        $this->post($expectedUser->unsubscribeLink())
+            ->assertNoContent();
+
+        $this->assertTrue($called);
+    }
+
+    public function test_it_returns_200_for_rfc8058_one_click_post_unsubscribe_from_mailing_list()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var DummyUser $user */
+        $expectedUser = DummyUser::create([
+            'name' => 'test',
+            'email' => 'test@testing.local',
+            'password' => 'test',
+        ]);
+
+        Subscriber::userModel(DummyUser::class);
+
+        $called = false;
+        Subscriber::onUnsubscribeFromMailingList(function ($user, $list) use (&$called) {
+            $called = true;
+            $this->assertEquals('newsletter', $list);
+        });
+
+        $this->post($expectedUser->unsubscribeLink('newsletter'))
+            ->assertNoContent();
+
+        $this->assertTrue($called);
+    }
 }

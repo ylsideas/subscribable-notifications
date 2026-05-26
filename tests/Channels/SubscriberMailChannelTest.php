@@ -12,6 +12,7 @@ use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiable;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiableWithSubscriptions;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotification;
+use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotificationWithEnumMailingList;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotificationWithMailingList;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotificationWithQueuing;
 
@@ -55,6 +56,14 @@ class SubscriberMailChannelTest extends TestCase
             $this->assertEquals(
                 '<https://testing.local/unsubscribe/testing-list>',
                 $this->getHeaderContent($event->message, 'List-Unsubscribe')
+            );
+
+            $this->assertTrue(
+                $event->message->getHeaders()->has('List-Unsubscribe-Post')
+            );
+            $this->assertEquals(
+                'List-Unsubscribe=One-Click',
+                $this->getHeaderContent($event->message, 'List-Unsubscribe-Post')
             );
 
             $content = $this->getContent($event->message);
@@ -112,6 +121,14 @@ class SubscriberMailChannelTest extends TestCase
                 $this->getHeaderContent($event->message, 'List-Unsubscribe')
             );
 
+            $this->assertTrue(
+                $event->message->getHeaders()->has('List-Unsubscribe-Post')
+            );
+            $this->assertEquals(
+                'List-Unsubscribe=One-Click',
+                $this->getHeaderContent($event->message, 'List-Unsubscribe-Post')
+            );
+
             $content = $this->getContent($event->message);
 
             $this->assertStringContainsString(
@@ -154,6 +171,14 @@ class SubscriberMailChannelTest extends TestCase
             $this->assertEquals(
                 '<https://testing.local/unsubscribe>',
                 $this->getHeaderContent($event->message, 'List-Unsubscribe')
+            );
+
+            $this->assertTrue(
+                $event->message->getHeaders()->has('List-Unsubscribe-Post')
+            );
+            $this->assertEquals(
+                'List-Unsubscribe=One-Click',
+                $this->getHeaderContent($event->message, 'List-Unsubscribe-Post')
             );
 
             $content = $this->getContent($event->message);
@@ -289,6 +314,31 @@ class SubscriberMailChannelTest extends TestCase
             $this->assertStringContainsString(
                 'This is a dummy',
                 $content
+            );
+
+            return true;
+        });
+    }
+
+    public function test_it_resolves_enum_mailing_list_to_its_string_value()
+    {
+        Event::fake([
+            MessageSending::class,
+            MessageSent::class,
+        ]);
+
+        $notifiable = new DummyNotifiableWithSubscriptions();
+        $notifiable->notify(new DummyNotificationWithEnumMailingList());
+
+        Event::assertDispatched(MessageSending::class, function (MessageSending $event) {
+            $this->assertArrayHasKey('unsubscribeLink', $event->data);
+            $this->assertEquals(
+                'https://testing.local/unsubscribe/newsletter',
+                $event->data['unsubscribeLink']
+            );
+            $this->assertEquals(
+                '<https://testing.local/unsubscribe/newsletter>',
+                $this->getHeaderContent($event->message, 'List-Unsubscribe')
             );
 
             return true;

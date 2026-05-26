@@ -1,6 +1,6 @@
 {
     "name": "ylsideas/subscribable-notifications",
-    "description": "A Laravel package for adding unsubscribe links to notifications",
+    "description": "A Laravel package for adding RFC 8058 compliant unsubscribe links to notifications",
     "keywords": [
         "ylsideas",
         "unsubscribable-notification",

@@ -59,6 +59,11 @@ class UnsubscribeController extends Controller
 
         event(new UserUnsubscribed($subscriber, $mailingList));
 
+        // RFC 8058: one-click POST must not redirect; return 204 No Content
+        if ($request->isMethod('post')) {
+            return response('', 204);
+        }
+
         return $this->subscriber->complete($subscriber, $mailingList);
     }
 }

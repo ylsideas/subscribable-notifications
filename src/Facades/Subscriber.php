@@ -4,6 +4,7 @@ namespace YlsIdeas\SubscribableNotifications\Facades;
 
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Facade;
+use YlsIdeas\SubscribableNotifications\Testing\FakeSubscriber;
 
 /**
  * Class Subscriber.
@@ -28,5 +29,13 @@ class Subscriber extends Facade
     protected static function getFacadeAccessor()
     {
         return \YlsIdeas\SubscribableNotifications\Subscriber::class;
+    }
+
+    public static function fake(): FakeSubscriber
+    {
+        $fake = new FakeSubscriber();
+        static::swap($fake);
+
+        return $fake;
     }
 }

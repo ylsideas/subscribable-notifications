@@ -47,7 +47,7 @@ class SubscriberMailChannel extends MailChannel
         if ($notifiable instanceof CanUnsubscribe && $message instanceof MailMessage) {
             if ($notification instanceof AppliesToMailingList) {
                 $message->viewData['unsubscribeLink'] = $notifiable->unsubscribeLink(
-                    $notification->usesMailingList()
+                    $this->mailingListValue($notification)
                 );
             }
             $message->viewData['unsubscribeLinkForAll'] = $notifiable->unsubscribeLink();
@@ -90,11 +90,22 @@ class SubscriberMailChannel extends MailChannel
                 'List-Unsubscribe',
                 sprintf('<%s>', $notifiable->unsubscribeLink(
                     $notification instanceof AppliesToMailingList
-                        ? $notification->usesMailingList()
+                        ? $this->mailingListValue($notification)
                         : null
                 ))
             );
+            $mailMessage->getHeaders()->addTextHeader(
+                'List-Unsubscribe-Post',
+                'List-Unsubscribe=One-Click'
+            );
         }
+    }
+
+    private function mailingListValue(AppliesToMailingList $notification): string
+    {
+        $list = $notification->usesMailingList();
+
+        return $list instanceof \BackedEnum ? $list->value : $list;
     }
 
     /**
