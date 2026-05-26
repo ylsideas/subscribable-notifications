@@ -28,7 +28,7 @@ The unsubscribe route accepts `GET` (browser link) and `POST` (one-click from em
 composer require ylsideas/subscribable-notifications:^2.0
 ```
 
-Publish the application service provider stub:
+Publish the application service provider:
 
 ```bash
 php artisan vendor:publish --tag=subscriber-provider
@@ -50,6 +50,41 @@ Or in `config/app.php` for older projects:
     // ...
     App\Providers\SubscribableServiceProvider::class,
 ],
+```
+
+The published provider is a plain `ServiceProvider` — open it and fill in the handler closures. There is no base class to extend or abstract methods to implement:
+
+```php
+use Illuminate\Support\ServiceProvider;
+use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
+
+class SubscribableServiceProvider extends ServiceProvider
+{
+    public function boot(): void
+    {
+        Subscriber::routes();
+
+        Subscriber::onUnsubscribeFromMailingList(function ($notifiable, string $mailingList) {
+            // Remove the notifiable's subscription to the given mailing list.
+        });
+
+        Subscriber::onUnsubscribeFromAllMailingLists(function ($notifiable) {
+            // Remove the notifiable's subscription to all mailing lists.
+        });
+
+        Subscriber::onCompletion(function ($notifiable, ?string $mailingList) {
+            return redirect('/');
+        });
+
+        Subscriber::onCheckSubscriptionStatusOfMailingList(function ($notifiable, string $mailingList): bool {
+            return true;
+        });
+
+        Subscriber::onCheckSubscriptionStatusOfAllMailingLists(function ($notifiable): bool {
+            return true;
+        });
+    }
+}
 ```
 
 ## Setup
@@ -144,62 +179,34 @@ class WeeklyDigest extends Notification implements AppliesToMailingList
 
 ### Configuring the unsubscribe handlers
 
-The published `App\Providers\SubscribableServiceProvider` has five methods to implement. Each returns a closure (or a `Class@method` string) that will be called at the appropriate point in the unsubscribe flow.
+The five `Subscriber::on*` calls in the published provider are the only configuration needed. Each accepts a closure or a `Class@method` string that will be resolved from the service container:
 
 ```php
-use YlsIdeas\SubscribableNotifications\SubscribableApplicationServiceProvider;
-
-class SubscribableServiceProvider extends SubscribableApplicationServiceProvider
-{
-    // Called when a user unsubscribes from a specific mailing list
-    public function onUnsubscribeFromMailingList()
-    {
-        return function ($notifiable, string $mailingList) {
-            $notifiable->subscriptions()->where('list', $mailingList)->delete();
-        };
-    }
-
-    // Called when a user unsubscribes from all emails
-    public function onUnsubscribeFromAllMailingLists()
-    {
-        return function ($notifiable) {
-            $notifiable->update(['unsubscribed_at' => now()]);
-        };
-    }
-
-    // Called after unsubscribing to determine the browser response (GET requests only)
-    public function onCompletion()
-    {
-        return function ($notifiable, ?string $mailingList) {
-            return redirect()->route('unsubscribe.confirmed');
-        };
-    }
-
-    // Return true if the notifiable is subscribed to a specific list
-    public function onCheckSubscriptionStatusOfMailingList()
-    {
-        return function ($notifiable, string $mailingList) {
-            return $notifiable->subscriptions()->where('list', $mailingList)->exists();
-        };
-    }
-
-    // Return true if the notifiable has not globally unsubscribed
-    public function onCheckSubscriptionStatusOfAllMailingLists()
-    {
-        return function ($notifiable) {
-            return $notifiable->unsubscribed_at === null;
-        };
-    }
-}
+Subscriber::onUnsubscribeFromAllMailingLists(\App\Handlers\UnsubscribeHandler::class . '@handleAll');
 ```
 
-You may also return a `Class@method` string and the class will be resolved from the service container:
+A realistic implementation might look like:
 
 ```php
-public function onUnsubscribeFromAllMailingLists()
-{
-    return \App\Handlers\UnsubscribeHandler::class . '@handleAll';
-}
+Subscriber::onUnsubscribeFromMailingList(function ($notifiable, string $mailingList) {
+    $notifiable->subscriptions()->where('list', $mailingList)->delete();
+});
+
+Subscriber::onUnsubscribeFromAllMailingLists(function ($notifiable) {
+    $notifiable->update(['unsubscribed_at' => now()]);
+});
+
+Subscriber::onCompletion(function ($notifiable, ?string $mailingList) {
+    return redirect()->route('unsubscribe.confirmed');
+});
+
+Subscriber::onCheckSubscriptionStatusOfMailingList(function ($notifiable, string $mailingList): bool {
+    return $notifiable->subscriptions()->where('list', $mailingList)->exists();
+});
+
+Subscriber::onCheckSubscriptionStatusOfAllMailingLists(function ($notifiable): bool {
+    return $notifiable->unsubscribed_at === null;
+});
 ```
 
 ### Blocking sends for unsubscribed users

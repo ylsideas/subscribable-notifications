@@ -2,60 +2,36 @@
 
 namespace App\Providers;
 
-use YlsIdeas\SubscribableNotifications\SubscribableApplicationServiceProvider;
+use Illuminate\Support\ServiceProvider;
+use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
 
-class SubscribableServiceProvider extends SubscribableApplicationServiceProvider
+class SubscribableServiceProvider extends ServiceProvider
 {
-    protected $loadRoutes = true;
-
-    /**
-     * @return callable|string
-     */
-    public function onUnsubscribeFromMailingList()
+    public function boot(): void
     {
-        return function ($user, $mailingList) {
+        Subscriber::routes();
 
-        };
-    }
+        Subscriber::onUnsubscribeFromMailingList(function ($notifiable, string $mailingList) {
+            // Remove the notifiable's subscription to the given mailing list.
+        });
 
-    /**
-     * @return callable|string
-     */
-    public function onUnsubscribeFromAllMailingLists()
-    {
-        return function ($user) {
+        Subscriber::onUnsubscribeFromAllMailingLists(function ($notifiable) {
+            // Remove the notifiable's subscription to all mailing lists.
+        });
 
-        };
-    }
+        Subscriber::onCompletion(function ($notifiable, ?string $mailingList) {
+            // Return the response shown to the user after unsubscribing (GET requests only).
+            return redirect('/');
+        });
 
-    /**
-     * @return callable|string
-     */
-    public function onCompletion()
-    {
-        return function ($user, $mailingList) {
-            return response()
-                ->redirectTo('/');
-        };
-    }
-
-    /**
-     * @return callable|string
-     */
-    public function onCheckSubscriptionStatusOfMailingList()
-    {
-        return function ($user, $mailingList) {
+        Subscriber::onCheckSubscriptionStatusOfMailingList(function ($notifiable, string $mailingList): bool {
+            // Return true if the notifiable is subscribed to this mailing list.
             return true;
-        };
-    }
+        });
 
-    /**
-     * @return callable|string
-     */
-    public function onCheckSubscriptionStatusOfAllMailingLists()
-    {
-        return function ($user) {
+        Subscriber::onCheckSubscriptionStatusOfAllMailingLists(function ($notifiable): bool {
+            // Return true if the notifiable has not globally unsubscribed.
             return true;
-        };
+        });
     }
 }
