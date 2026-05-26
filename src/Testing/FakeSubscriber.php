@@ -15,22 +15,34 @@ class FakeSubscriber
 
     protected bool $subscriptionStatus = true;
 
-    public function routes($router = null): void {}
+    public function routes($router = null): void
+    {
+    }
 
     public function routeName(): string
     {
         return $this->routeName;
     }
 
-    public function onUnsubscribeFromMailingList($handler): void {}
+    public function onUnsubscribeFromMailingList($handler): void
+    {
+    }
 
-    public function onUnsubscribeFromAllMailingLists($handler): void {}
+    public function onUnsubscribeFromAllMailingLists($handler): void
+    {
+    }
 
-    public function onCompletion($handler): void {}
+    public function onCompletion($handler): void
+    {
+    }
 
-    public function onCheckSubscriptionStatusOfAllMailingLists($handler): void {}
+    public function onCheckSubscriptionStatusOfAllMailingLists($handler): void
+    {
+    }
 
-    public function onCheckSubscriptionStatusOfMailingList($handler): void {}
+    public function onCheckSubscriptionStatusOfMailingList($handler): void
+    {
+    }
 
     public function unsubscribeFromMailingList($user, string $mailingList): void
     {
