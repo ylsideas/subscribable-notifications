@@ -2,9 +2,9 @@
 
 namespace YlsIdeas\SubscribableNotifications\Tests\Support;
 
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use YlsIdeas\SubscribableNotifications\Contracts\AppliesToMailingList;
+use YlsIdeas\SubscribableNotifications\Messages\SubscribableMailMessage;
 
 class DummyNotificationWithEnumMailingList extends Notification implements AppliesToMailingList
 {
@@ -13,9 +13,9 @@ class DummyNotificationWithEnumMailingList extends Notification implements Appli
         return ['mail'];
     }
 
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable): SubscribableMailMessage
     {
-        return (new MailMessage())
+        return SubscribableMailMessage::via($notifiable, $this)
             ->line('The introduction to the notification.');
     }
 

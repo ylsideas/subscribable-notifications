@@ -3,16 +3,15 @@
 namespace YlsIdeas\SubscribableNotifications;
 
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Notifications\Channels\MailChannel;
+use Illuminate\Notifications\Events\NotificationSending;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
-use YlsIdeas\SubscribableNotifications\Channels\SubscriberMailChannel;
+use YlsIdeas\SubscribableNotifications\Contracts\CheckNotifiableSubscriptionStatus;
+use YlsIdeas\SubscribableNotifications\Contracts\CheckSubscriptionStatusBeforeSendingNotifications;
 
 class SubscribableServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap the application services.
-     */
-    public function boot()
+    public function boot(): void
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'subscriber');
 
@@ -25,14 +24,22 @@ class SubscribableServiceProvider extends ServiceProvider
                 __DIR__.'/../stubs/SubscribableServiceProvider.stub' => app_path('Providers/SubscribableServiceProvider.php'),
             ], 'subscriber-provider');
         }
+
+        Event::listen(NotificationSending::class, function (NotificationSending $event) {
+            if ($event->channel !== 'mail') {
+                return;
+            }
+            if ($event->notifiable instanceof CheckSubscriptionStatusBeforeSendingNotifications &&
+                $event->notification instanceof CheckNotifiableSubscriptionStatus &&
+                $event->notification->checkMailSubscriptionStatus() &&
+                ! $event->notifiable->mailSubscriptionStatus($event->notification)) {
+                return false;
+            }
+        });
     }
 
-    /**
-     * Register the application services.
-     */
-    public function register()
+    public function register(): void
     {
-        $this->app->bind(MailChannel::class, SubscriberMailChannel::class);
         $this->app->singleton(Subscriber::class, function (Application $app) {
             /** @phpstan-ignore-next-line */
             return new Subscriber($app);
