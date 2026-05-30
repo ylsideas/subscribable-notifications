@@ -19,18 +19,14 @@
 {{-- Action Button --}}
 @isset($actionText)
 <?php
-    switch ($level) {
-        case 'success':
-        case 'error':
-            $color = $level;
-            break;
-        default:
-            $color = 'primary';
-    }
+    $color = match ($level) {
+        'success', 'error' => $level,
+        default => 'primary',
+    };
 ?>
-@component('mail::button', ['url' => $actionUrl, 'color' => $color])
+<x-mail::button :url="$actionUrl" :color="$color">
 {{ $actionText }}
-@endcomponent
+</x-mail::button>
 @endisset
 
 {{-- Outro Lines --}}
@@ -43,20 +39,20 @@
 @if (! empty($salutation))
 {{ $salutation }}
 @else
-@lang('Regards'),<br>{{ config('app.name') }}
+@lang('Regards,')<br>
+{{ config('app.name') }}
 @endif
 
 {{-- Subcopy --}}
 @isset($actionText)
 @slot('subcopy')
 @lang(
-    "If you’re having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
-    'into your web browser: [:actionURL](:actionURL).',
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
+    'into your web browser:',
     [
         'actionText' => $actionText,
-        'actionURL' => $actionUrl,
     ]
-)
+) <span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span>
 @endslot
 @endisset
 
