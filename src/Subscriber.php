@@ -112,6 +112,7 @@ final class Subscriber implements SubscriberContract
         if ($this->onCompletion === null) {
             throw new \LogicException('No completion handler registered. Call Subscriber::onCompletion() in your service provider.');
         }
+
         return ($this->onCompletion)($user, $mailingList);
     }
 
