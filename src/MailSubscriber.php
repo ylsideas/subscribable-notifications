@@ -9,10 +9,6 @@ use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
 
 trait MailSubscriber
 {
-    /**
-     * @param string|null $mailingList
-     * @return string
-     */
     public function unsubscribeLink(?string $mailingList = null): string
     {
         return URL::signedRoute(
@@ -25,10 +21,6 @@ trait MailSubscriber
         );
     }
 
-    /**
-     * @param Notification $notification
-     * @return bool
-     */
     public function mailSubscriptionStatus(Notification $notification): bool
     {
         $list = $notification instanceof AppliesToMailingList

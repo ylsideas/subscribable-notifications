@@ -26,7 +26,7 @@ use YlsIdeas\SubscribableNotifications\Testing\FakeSubscriber;
  */
 class Subscriber extends Facade
 {
-    protected static function getFacadeAccessor()
+    protected static function getFacadeAccessor(): string
     {
         return \YlsIdeas\SubscribableNotifications\Subscriber::class;
     }

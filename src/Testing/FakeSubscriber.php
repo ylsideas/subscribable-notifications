@@ -5,62 +5,53 @@ namespace YlsIdeas\SubscribableNotifications\Testing;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\Assert;
 
-class FakeSubscriber
+final class FakeSubscriber
 {
     public string $routeName = 'unsubscribe';
 
-    protected array $unsubscribedFromMailingList = [];
+    private array $unsubscribedFromMailingList = [];
+    private array $unsubscribedFromAll = [];
+    private array $subscriptionStatusChecks = [];
+    private bool $subscriptionStatus = true;
 
-    protected array $unsubscribedFromAll = [];
+    public function routes(mixed $router = null): void {}
 
-    protected bool $subscriptionStatus = true;
-
-    public function routes($router = null): void
-    {
-    }
+    public function legacyRoutes(string $defaultModel, mixed $router = null): void {}
 
     public function routeName(): string
     {
         return $this->routeName;
     }
 
-    public function onUnsubscribeFromMailingList($handler): void
-    {
-    }
+    public function onUnsubscribeFromMailingList(mixed $handler): void {}
 
-    public function onUnsubscribeFromAllMailingLists($handler): void
-    {
-    }
+    public function onUnsubscribeFromAllMailingLists(mixed $handler): void {}
 
-    public function onCompletion($handler): void
-    {
-    }
+    public function onCompletion(mixed $handler): void {}
 
-    public function onCheckSubscriptionStatusOfAllMailingLists($handler): void
-    {
-    }
+    public function onCheckSubscriptionStatusOfAllMailingLists(mixed $handler): void {}
 
-    public function onCheckSubscriptionStatusOfMailingList($handler): void
-    {
-    }
+    public function onCheckSubscriptionStatusOfMailingList(mixed $handler): void {}
 
-    public function unsubscribeFromMailingList($user, string $mailingList): void
+    public function unsubscribeFromMailingList(mixed $user, string $mailingList): void
     {
         $this->unsubscribedFromMailingList[] = ['user' => $user, 'list' => $mailingList];
     }
 
-    public function unsubscribeFromAllMailingLists($user): void
+    public function unsubscribeFromAllMailingLists(mixed $user): void
     {
         $this->unsubscribedFromAll[] = $user;
     }
 
-    public function complete($user, ?string $mailingList = null): Response
+    public function complete(mixed $user, ?string $mailingList = null): Response
     {
         return new Response('', 200);
     }
 
-    public function checkSubscriptionStatus($user, ?string $mailingList = null): bool
+    public function checkSubscriptionStatus(mixed $user, ?string $mailingList = null): bool
     {
+        $this->subscriptionStatusChecks[] = ['user' => $user, 'mailingList' => $mailingList];
+
         return $this->subscriptionStatus;
     }
 
@@ -92,6 +83,17 @@ class FakeSubscriber
         Assert::assertTrue(
             collect($this->unsubscribedFromAll)->contains($user),
             'Failed asserting that the user was unsubscribed from all mailing lists.'
+        );
+    }
+
+    public function assertCheckedSubscriptionStatus(mixed $user, ?string $mailingList): void
+    {
+        Assert::assertTrue(
+            collect($this->subscriptionStatusChecks)
+                ->contains(fn ($item) => $item['user'] === $user && $item['mailingList'] === $mailingList),
+            $mailingList !== null
+                ? "Failed asserting that subscription status was checked for mailing list [{$mailingList}]."
+                : 'Failed asserting that subscription status was checked for all mailing lists.'
         );
     }
 

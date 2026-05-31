@@ -2,22 +2,10 @@
 
 namespace YlsIdeas\SubscribableNotifications\Events;
 
-use Illuminate\Foundation\Auth\User;
-
-class UserUnsubscribing
+final class UserUnsubscribing
 {
-    /**
-     * @var User
-     */
-    public $user;
-    /**
-     * @var string|null
-     */
-    public $mailingList;
-
-    public function __construct($user, ?string $mailingList = null)
-    {
-        $this->user = $user;
-        $this->mailingList = $mailingList;
-    }
+    public function __construct(
+        public readonly object $user,
+        public readonly ?string $mailingList = null,
+    ) {}
 }

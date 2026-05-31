@@ -6,14 +6,14 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use YlsIdeas\SubscribableNotifications\Subscriber;
 
-class LegacyUnsubscribeController extends Controller
+final class LegacyUnsubscribeController extends Controller
 {
     public function __construct(private readonly Subscriber $subscriber)
     {
         $this->middleware('signed');
     }
 
-    public function __invoke(Request $request, $subscriberId, ?string $mailingList = null)
+    public function __invoke(Request $request, mixed $subscriberId, ?string $mailingList = null): mixed
     {
         return app(UnsubscribeController::class)(
             $request,

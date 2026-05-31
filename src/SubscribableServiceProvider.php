@@ -2,14 +2,13 @@
 
 namespace YlsIdeas\SubscribableNotifications;
 
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use YlsIdeas\SubscribableNotifications\Contracts\CheckNotifiableSubscriptionStatus;
 use YlsIdeas\SubscribableNotifications\Contracts\CheckSubscriptionStatusBeforeSendingNotifications;
 
-class SubscribableServiceProvider extends ServiceProvider
+final class SubscribableServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
@@ -40,9 +39,6 @@ class SubscribableServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->app->singleton(Subscriber::class, function (Application $app) {
-            /** @phpstan-ignore-next-line */
-            return new Subscriber($app);
-        });
+        $this->app->singleton(Subscriber::class, fn () => new Subscriber($this->app));
     }
 }

@@ -4,57 +4,35 @@ namespace YlsIdeas\SubscribableNotifications;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 
-class Subscriber
+final class Subscriber
 {
-    public $uri = 'unsubscribe/{subscriberType}/{subscriberId}/{mailingList?}';
-    public $hander = '\YlsIdeas\SubscribableNotifications\Controllers\UnsubscribeController';
-    public $routeName = 'unsubscribe';
+    public string $uri = 'unsubscribe/{subscriberType}/{subscriberId}/{mailingList?}';
+    public string $handler = '\YlsIdeas\SubscribableNotifications\Controllers\UnsubscribeController';
+    public string $routeName = 'unsubscribe';
 
     /** Morph type stored when legacyRoutes() is called — used by LegacyUnsubscribeController. */
     public ?string $legacySubscriberType = null;
-    /**
-     * @var callable
-     */
-    protected $onUnsubscribeFromMailingList;
-    /**
-     * @var callable
-     */
-    protected $onUnsubscribeFromAllMailingLists;
-    /**
-     * @var callable
-     */
-    protected $onCompletion;
-    /**
-     * @var callable
-     */
-    protected $onCheckSubscriptionStatusForMailingLists;
-    /**
-     * @var callable
-     */
-    protected $onCheckSubscriptionStatusForAllMailingLists;
 
-    /**
-     * @var Application
-     */
-    protected $app;
+    private ?\Closure $onUnsubscribeFromMailingList = null;
+    private ?\Closure $onUnsubscribeFromAllMailingLists = null;
+    private ?\Closure $onCompletion = null;
+    private ?\Closure $onCheckSubscriptionStatusForMailingLists = null;
+    private ?\Closure $onCheckSubscriptionStatusForAllMailingLists = null;
 
-    public function __construct(Application $app)
-    {
-        $this->app = $app;
-    }
+    public function __construct(private readonly Application $app)
+    {}
 
-    public function routes($router = null): void
+    public function routes(mixed $router = null): void
     {
         $router = $router ?? $this->app->make('router');
-        $router->match(['GET', 'POST'], $this->uri, $this->hander)
+        $router->match(['GET', 'POST'], $this->uri, $this->handler)
             ->name($this->routeName)
             ->where('subscriberType', '[^\d/][^/]*');
     }
 
-    public function legacyRoutes(string $defaultModel, $router = null): void
+    public function legacyRoutes(string $defaultModel, mixed $router = null): void
     {
         $router = $router ?? $this->app->make('router');
 
@@ -68,110 +46,69 @@ class Subscriber
         )->name($this->routeName . '.legacy');
     }
 
-    /**
-     * @return string
-     */
-    public function routeName()
+    public function routeName(): string
     {
         return $this->routeName;
     }
 
-    /**
-     * @param string|callable $handler
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     */
-    public function onUnsubscribeFromMailingList($handler)
+    public function onUnsubscribeFromMailingList(string|callable $handler): void
     {
         $this->onUnsubscribeFromMailingList = $this->parseHandler($handler);
     }
 
-    /**
-     * @param string|callable $handler
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     */
-    public function onUnsubscribeFromAllMailingLists($handler)
+    public function onUnsubscribeFromAllMailingLists(string|callable $handler): void
     {
         $this->onUnsubscribeFromAllMailingLists = $this->parseHandler($handler);
     }
 
-    /**
-     * @param string|callable $handler
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     */
-    public function onCompletion($handler)
+    public function onCompletion(string|callable $handler): void
     {
         $this->onCompletion = $this->parseHandler($handler);
     }
 
-    /**
-     * @param string|callable $handler
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     */
-    public function onCheckSubscriptionStatusOfAllMailingLists($handler)
+    public function onCheckSubscriptionStatusOfAllMailingLists(string|callable $handler): void
     {
         $this->onCheckSubscriptionStatusForAllMailingLists = $this->parseHandler($handler);
     }
 
-    /**
-     * @param string|callable $handler
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     */
-    public function onCheckSubscriptionStatusOfMailingList($handler)
+    public function onCheckSubscriptionStatusOfMailingList(string|callable $handler): void
     {
         $this->onCheckSubscriptionStatusForMailingLists = $this->parseHandler($handler);
     }
 
-    /**
-     * @param mixed $user
-     * @param string $mailingList
-     */
-    public function unsubscribeFromMailingList($user, string $mailingList)
+    public function unsubscribeFromMailingList(mixed $user, string $mailingList): void
     {
-        call_user_func($this->onUnsubscribeFromMailingList, $user, $mailingList);
+        ($this->onUnsubscribeFromMailingList)($user, $mailingList);
     }
 
-    /**
-     * @param mixed $user
-     */
-    public function unsubscribeFromAllMailingLists($user)
+    public function unsubscribeFromAllMailingLists(mixed $user): void
     {
-        call_user_func($this->onUnsubscribeFromAllMailingLists, $user);
+        ($this->onUnsubscribeFromAllMailingLists)($user);
     }
 
-    /**
-     * @param mixed $user
-     * @param string|null $mailingList
-     * @return Response
-     */
-    public function complete($user, ?string $mailingList = null)
+    public function complete(mixed $user, ?string $mailingList = null): mixed
     {
-        return call_user_func($this->onCompletion, $user, $mailingList);
+        return ($this->onCompletion)($user, $mailingList);
     }
 
-    /**
-     * @param mixed $user
-     * @param string|null $mailingList
-     * @return bool
-     */
-    public function checkSubscriptionStatus($user, ?string $mailingList = null)
+    public function checkSubscriptionStatus(mixed $user, ?string $mailingList = null): bool
     {
         if ($mailingList !== null) {
-            return (bool) call_user_func($this->onCheckSubscriptionStatusForAllMailingLists, $user) &&
-                (bool) call_user_func($this->onCheckSubscriptionStatusForMailingLists, $user, $mailingList);
+            return (bool) ($this->onCheckSubscriptionStatusForAllMailingLists)($user)
+                && (bool) ($this->onCheckSubscriptionStatusForMailingLists)($user, $mailingList);
         }
 
-        return (bool) call_user_func($this->onCheckSubscriptionStatusForAllMailingLists, $user);
+        return (bool) ($this->onCheckSubscriptionStatusForAllMailingLists)($user);
     }
 
-    protected function parseHandler(string|callable$handler): callable
+    private function parseHandler(string|callable $handler): \Closure
     {
         if (is_string($handler)) {
-            $parsed = Str::parseCallback($handler);
-            $parsed[0] = $this->app->make($parsed[0]);
+            [$class, $method] = Str::parseCallback($handler, '__invoke');
 
-            return $parsed;
+            return \Closure::fromCallable([$this->app->make($class), $method]);
         }
 
-        return $handler;
+        return \Closure::fromCallable($handler);
     }
 }
