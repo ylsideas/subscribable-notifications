@@ -211,6 +211,24 @@ class UnsubscribeControllerTest extends TestCase
         $this->assertTrue($called);
     }
 
+    public function test_fake_assertions_work_when_model_is_loaded_fresh_by_the_controller()
+    {
+        // This exercises the model-identity problem: the controller loads the user via
+        // ->first(), producing a different object instance than $expectedUser. The fake's
+        // assertions must compare by primary key, not by object identity (===).
+        $fake = Subscriber::fake();
+
+        $expectedUser = DummyUser::create([
+            'name' => 'test',
+            'email' => 'test@testing.local',
+            'password' => 'test',
+        ]);
+
+        $this->get($expectedUser->unsubscribeLink())->assertSuccessful();
+
+        $fake->assertUnsubscribedFromAll($expectedUser);
+    }
+
     public function test_it_rejects_post_without_rfc8058_body()
     {
         $expectedUser = DummyUser::create([

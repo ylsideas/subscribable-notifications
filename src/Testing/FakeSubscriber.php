@@ -6,7 +6,7 @@ use Illuminate\Http\Response;
 use PHPUnit\Framework\Assert;
 use YlsIdeas\SubscribableNotifications\Contracts\SubscriberContract;
 
-final class FakeSubscriber implements SubscriberContract
+class FakeSubscriber implements SubscriberContract
 {
     public string $routeName = 'unsubscribe';
 
@@ -93,7 +93,7 @@ final class FakeSubscriber implements SubscriberContract
     {
         Assert::assertTrue(
             collect($this->unsubscribedFromMailingList)
-                ->contains(fn ($item) => $item['user'] === $user && $item['list'] === $mailingList),
+                ->contains(fn ($item) => $this->matches($item['user'], $user) && $item['list'] === $mailingList),
             "Failed asserting that the user was unsubscribed from [{$mailingList}]."
         );
     }
@@ -101,7 +101,7 @@ final class FakeSubscriber implements SubscriberContract
     public function assertUnsubscribedFromAll(mixed $user): void
     {
         Assert::assertTrue(
-            collect($this->unsubscribedFromAll)->contains($user),
+            collect($this->unsubscribedFromAll)->contains(fn ($item) => $this->matches($item, $user)),
             'Failed asserting that the user was unsubscribed from all mailing lists.'
         );
     }
@@ -110,7 +110,7 @@ final class FakeSubscriber implements SubscriberContract
     {
         Assert::assertTrue(
             collect($this->subscriptionStatusChecks)
-                ->contains(fn ($item) => $item['user'] === $user && $item['mailingList'] === $mailingList),
+                ->contains(fn ($item) => $this->matches($item['user'], $user) && $item['mailingList'] === $mailingList),
             $mailingList !== null
                 ? "Failed asserting that subscription status was checked for mailing list [{$mailingList}]."
                 : 'Failed asserting that subscription status was checked for all mailing lists.'
@@ -127,5 +127,35 @@ final class FakeSubscriber implements SubscriberContract
             $this->unsubscribedFromAll,
             'Failed asserting that no all-mail unsubscribes occurred.'
         );
+    }
+
+    public function getUnsubscribedFromMailingList(): array
+    {
+        return $this->unsubscribedFromMailingList;
+    }
+
+    public function getUnsubscribedFromAll(): array
+    {
+        return $this->unsubscribedFromAll;
+    }
+
+    public function getSubscriptionStatusChecks(): array
+    {
+        return $this->subscriptionStatusChecks;
+    }
+
+    protected function matches(mixed $expected, mixed $actual): bool
+    {
+        if ($expected === $actual) {
+            return true;
+        }
+
+        if ($expected instanceof \Illuminate\Database\Eloquent\Model &&
+            $actual instanceof \Illuminate\Database\Eloquent\Model) {
+            return $expected->getMorphClass() === $actual->getMorphClass()
+                && (string) $expected->getKey() === (string) $actual->getKey();
+        }
+
+        return false;
     }
 }
