@@ -30,28 +30,34 @@ final class Subscriber
     {
     }
 
-    public function routes(mixed $router = null): void
+    public function routes(mixed $router = null, string|false $throttle = '60,1'): void
     {
         $router = $router ?? $this->app->make('router');
-        $router->match(['GET', 'POST'], $this->uri, $this->handler)
+        $route = $router->match(['GET', 'POST'], $this->uri, $this->handler)
             ->name($this->routeName)
-            ->where('subscriberType', '[^\d/][^/]*')
-            ->middleware('throttle:60,1');
+            ->where('subscriberType', '[^\d/][^/]*');
+
+        if ($throttle !== false) {
+            $route->middleware("throttle:{$throttle}");
+        }
     }
 
-    public function legacyRoutes(string $defaultModel, mixed $router = null): void
+    public function legacyRoutes(string $defaultModel, mixed $router = null, string|false $throttle = '60,1'): void
     {
         $router = $router ?? $this->app->make('router');
 
         $morphMap = Relation::morphMap();
         $this->legacySubscriberType = array_search($defaultModel, $morphMap, true) ?: $defaultModel;
 
-        $router->match(
+        $route = $router->match(
             ['GET', 'POST'],
             'unsubscribe/{subscriberId}/{mailingList?}',
             '\YlsIdeas\SubscribableNotifications\Controllers\LegacyUnsubscribeController'
-        )->name($this->routeName . '.legacy')
-            ->middleware('throttle:60,1');
+        )->name($this->routeName . '.legacy');
+
+        if ($throttle !== false) {
+            $route->middleware("throttle:{$throttle}");
+        }
     }
 
     public function routeName(): string

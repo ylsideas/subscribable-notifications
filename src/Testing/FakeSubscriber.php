@@ -14,11 +14,11 @@ final class FakeSubscriber
     private array $subscriptionStatusChecks = [];
     private bool $subscriptionStatus = true;
 
-    public function routes(mixed $router = null): void
+    public function routes(mixed $router = null, string|false $throttle = '60,1'): void
     {
     }
 
-    public function legacyRoutes(string $defaultModel, mixed $router = null): void
+    public function legacyRoutes(string $defaultModel, mixed $router = null, string|false $throttle = '60,1'): void
     {
     }
 

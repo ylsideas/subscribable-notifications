@@ -11,8 +11,8 @@ use YlsIdeas\SubscribableNotifications\Testing\FakeSubscriber;
  *
  * @see \YlsIdeas\SubscribableNotifications\Subscriber
  *
- * @method static void routes()
- * @method static void legacyRoutes(string $defaultModel)
+ * @method static void routes(mixed $router = null, string|false $throttle = '60,1')
+ * @method static void legacyRoutes(string $defaultModel, mixed $router = null, string|false $throttle = '60,1')
  * @method static string routeName()
  * @method static void onCompletion(callable|string $handler)
  * @method static void onUnsubscribeFromMailingList(callable|string $handler)

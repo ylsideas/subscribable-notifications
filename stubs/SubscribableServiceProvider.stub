@@ -11,6 +11,9 @@ class SubscribableServiceProvider extends ServiceProvider
     {
         // Note: register this route outside the 'web' middleware group to avoid CSRF token
         // verification on the POST (RFC 8058 one-click) endpoint.
+        // The throttle defaults to '60,1' (60 requests per minute). Adjust or disable:
+        // Subscriber::routes(throttle: '10,1');
+        // Subscriber::routes(throttle: false);
         Subscriber::routes();
 
         Subscriber::onUnsubscribeFromMailingList(function ($notifiable, string $mailingList) {
