@@ -87,6 +87,53 @@ class SubscribableServiceProvider extends ServiceProvider
 }
 ```
 
+## Route configuration
+
+### Throttling
+
+The unsubscribe route is throttled to 60 requests per minute by default. Pass a custom rate or `false` to the `throttle` parameter to override this:
+
+```php
+Subscriber::routes();                   // default: 60 requests per minute
+Subscriber::routes(throttle: '10,1');  // 10 requests per minute
+Subscriber::routes(throttle: false);   // disable throttling
+```
+
+The `throttle` parameter accepts the same `limit,decay` string format as Laravel's `throttle` middleware.
+
+### CSRF
+
+Register the unsubscribe route **outside** the `web` middleware group. RFC 8058 one-click POST requests from email clients do not include a CSRF token, and wrapping the route in `web` will cause all POST unsubscribes to fail with a 419.
+
+The safest approach is to call `Subscriber::routes()` at the top of your service provider's `boot` method, before `Route::middleware('web')->group(...)`:
+
+```php
+public function boot(): void
+{
+    Subscriber::routes();
+
+    // ... rest of your route/handler registration
+}
+```
+
+### Legacy route (v1 compatibility)
+
+If you are running a rolling upgrade from v1 and need old unsubscribe URLs (which do not include the subscriber type) to keep working, register the legacy route alongside the new one:
+
+```php
+Subscriber::routes();
+Subscriber::legacyRoutes(\App\Models\User::class);
+```
+
+The legacy route matches `unsubscribe/{subscriberId}/{mailingList?}` and resolves the subscriber type to the given model (or its morph-map alias). All throttle options apply:
+
+```php
+Subscriber::legacyRoutes(\App\Models\User::class, throttle: '10,1');
+Subscriber::legacyRoutes(\App\Models\User::class, throttle: false);
+```
+
+See [UPGRADE.md](UPGRADE.md) for the full migration guide.
+
 ## Setup
 
 ### 1. Apply the trait to your notifiable model
@@ -297,6 +344,7 @@ Available assertions:
 | `assertUnsubscribedFromMailingList($notifiable, $list)` | Assert the notifiable was unsubscribed from a specific list |
 | `assertUnsubscribedFromAll($notifiable)` | Assert the notifiable was globally unsubscribed |
 | `assertNothingUnsubscribed()` | Assert no unsubscribe actions occurred |
+| `assertCheckedSubscriptionStatus($notifiable, $list)` | Assert subscription status was checked for the given list (`null` for global) |
 
 To control subscription status checks in feature tests:
 
