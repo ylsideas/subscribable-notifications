@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Mime\Email;
+use Illuminate\Notifications\Messages\MailMessage;
+use YlsIdeas\SubscribableNotifications\Concerns\SubscribableNotification;
 use YlsIdeas\SubscribableNotifications\Messages\SubscribableMailMessage;
 use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
 use YlsIdeas\SubscribableNotifications\Tests\Support\DummyNotifiable;
@@ -60,6 +62,27 @@ class SubscribableMailMessageTest extends TestCase
         $message = SubscribableMailMessage::via($notifiable, new DummyNotificationWithEnumMailingList());
 
         $this->assertEquals('https://testing.local/unsubscribe/newsletter', $message->viewData['unsubscribeLink']);
+    }
+
+    public function test_via_accepts_a_custom_template()
+    {
+        $notifiable = new DummyNotifiableWithSubscriptions();
+        $message = SubscribableMailMessage::via($notifiable, new DummyNotification(), 'my-package::custom');
+
+        $this->assertEquals('my-package::custom', $message->markdown);
+    }
+
+    public function test_trait_can_be_applied_to_custom_mail_message_class()
+    {
+        $customClass = new class extends MailMessage {
+            use SubscribableNotification;
+        };
+
+        $message = $customClass::via(new DummyNotifiableWithSubscriptions(), new DummyNotification());
+
+        $this->assertInstanceOf($customClass::class, $message);
+        $this->assertEquals('subscriber::html', $message->markdown);
+        $this->assertArrayHasKey('unsubscribeLinkForAll', $message->viewData);
     }
 
     public function test_via_registers_a_symfony_message_callback()
