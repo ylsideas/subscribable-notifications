@@ -4,11 +4,11 @@ namespace YlsIdeas\SubscribableNotifications\Tests\Messages;
 
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Mime\Email;
-use Illuminate\Notifications\Messages\MailMessage;
 use YlsIdeas\SubscribableNotifications\Concerns\SubscribableNotification;
 use YlsIdeas\SubscribableNotifications\Messages\SubscribableMailMessage;
 use YlsIdeas\SubscribableNotifications\SubscribableServiceProvider;
@@ -74,7 +74,7 @@ class SubscribableMailMessageTest extends TestCase
 
     public function test_trait_can_be_applied_to_custom_mail_message_class()
     {
-        $customClass = new class extends MailMessage {
+        $customClass = new class () extends MailMessage {
             use SubscribableNotification;
         };
 
