@@ -22,7 +22,8 @@ final class Subscriber
     private ?\Closure $onCheckSubscriptionStatusForAllMailingLists = null;
 
     public function __construct(private readonly Application $app)
-    {}
+    {
+    }
 
     public function routes(mixed $router = null): void
     {

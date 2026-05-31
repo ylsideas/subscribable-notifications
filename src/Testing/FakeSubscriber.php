@@ -14,24 +14,38 @@ final class FakeSubscriber
     private array $subscriptionStatusChecks = [];
     private bool $subscriptionStatus = true;
 
-    public function routes(mixed $router = null): void {}
+    public function routes(mixed $router = null): void
+    {
+    }
 
-    public function legacyRoutes(string $defaultModel, mixed $router = null): void {}
+    public function legacyRoutes(string $defaultModel, mixed $router = null): void
+    {
+    }
 
     public function routeName(): string
     {
         return $this->routeName;
     }
 
-    public function onUnsubscribeFromMailingList(mixed $handler): void {}
+    public function onUnsubscribeFromMailingList(mixed $handler): void
+    {
+    }
 
-    public function onUnsubscribeFromAllMailingLists(mixed $handler): void {}
+    public function onUnsubscribeFromAllMailingLists(mixed $handler): void
+    {
+    }
 
-    public function onCompletion(mixed $handler): void {}
+    public function onCompletion(mixed $handler): void
+    {
+    }
 
-    public function onCheckSubscriptionStatusOfAllMailingLists(mixed $handler): void {}
+    public function onCheckSubscriptionStatusOfAllMailingLists(mixed $handler): void
+    {
+    }
 
-    public function onCheckSubscriptionStatusOfMailingList(mixed $handler): void {}
+    public function onCheckSubscriptionStatusOfMailingList(mixed $handler): void
+    {
+    }
 
     public function unsubscribeFromMailingList(mixed $user, string $mailingList): void
     {
