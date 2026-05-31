@@ -182,7 +182,7 @@ class UnsubscribeControllerTest extends TestCase
             $called = true;
         });
 
-        $this->post($expectedUser->unsubscribeLink())
+        $this->post($expectedUser->unsubscribeLink(), ['List-Unsubscribe' => 'One-Click'])
             ->assertNoContent();
 
         $this->assertTrue($called);
@@ -205,9 +205,21 @@ class UnsubscribeControllerTest extends TestCase
             $this->assertEquals('newsletter', $list);
         });
 
-        $this->post($expectedUser->unsubscribeLink('newsletter'))
+        $this->post($expectedUser->unsubscribeLink('newsletter'), ['List-Unsubscribe' => 'One-Click'])
             ->assertNoContent();
 
         $this->assertTrue($called);
+    }
+
+    public function test_it_rejects_post_without_rfc8058_body()
+    {
+        $expectedUser = DummyUser::create([
+            'name' => 'test',
+            'email' => 'test@testing.local',
+            'password' => 'test',
+        ]);
+
+        $this->post($expectedUser->unsubscribeLink())
+            ->assertStatus(400);
     }
 }

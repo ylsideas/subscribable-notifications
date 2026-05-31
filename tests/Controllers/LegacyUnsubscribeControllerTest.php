@@ -81,7 +81,7 @@ class LegacyUnsubscribeControllerTest extends TestCase
 
         $url = URL::signedRoute('unsubscribe.legacy', ['subscriberId' => $user->id]);
 
-        $this->post($url)->assertNoContent();
+        $this->post($url, ['List-Unsubscribe' => 'One-Click'])->assertNoContent();
     }
 
     public function test_legacy_url_does_not_interfere_with_new_route()

@@ -46,6 +46,10 @@ final class UnsubscribeController extends Controller
         event(new UserUnsubscribed($subscriber, $mailingList));
 
         if ($request->isMethod('post')) {
+            if ($request->input('List-Unsubscribe') !== 'One-Click') {
+                abort(400, __('Invalid unsubscribe request'));
+            }
+
             return response('', 204);
         }
 

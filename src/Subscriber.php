@@ -13,7 +13,12 @@ final class Subscriber
     public string $routeName = 'unsubscribe';
 
     /** Morph type stored when legacyRoutes() is called — used by LegacyUnsubscribeController. */
-    public ?string $legacySubscriberType = null;
+    private ?string $legacySubscriberType = null;
+
+    public function getLegacySubscriberType(): ?string
+    {
+        return $this->legacySubscriberType;
+    }
 
     private ?\Closure $onUnsubscribeFromMailingList = null;
     private ?\Closure $onUnsubscribeFromAllMailingLists = null;
@@ -30,7 +35,8 @@ final class Subscriber
         $router = $router ?? $this->app->make('router');
         $router->match(['GET', 'POST'], $this->uri, $this->handler)
             ->name($this->routeName)
-            ->where('subscriberType', '[^\d/][^/]*');
+            ->where('subscriberType', '[^\d/][^/]*')
+            ->middleware('throttle:60,1');
     }
 
     public function legacyRoutes(string $defaultModel, mixed $router = null): void
@@ -44,7 +50,8 @@ final class Subscriber
             ['GET', 'POST'],
             'unsubscribe/{subscriberId}/{mailingList?}',
             '\YlsIdeas\SubscribableNotifications\Controllers\LegacyUnsubscribeController'
-        )->name($this->routeName . '.legacy');
+        )->name($this->routeName . '.legacy')
+            ->middleware('throttle:60,1');
     }
 
     public function routeName(): string

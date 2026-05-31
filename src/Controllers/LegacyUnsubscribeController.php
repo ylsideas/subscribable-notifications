@@ -17,7 +17,7 @@ final class LegacyUnsubscribeController extends Controller
     {
         return app(UnsubscribeController::class)(
             $request,
-            $this->subscriber->legacySubscriberType,
+            $this->subscriber->getLegacySubscriberType(),
             $subscriberId,
             $mailingList
         );

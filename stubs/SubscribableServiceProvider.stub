@@ -9,6 +9,8 @@ class SubscribableServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        // Note: register this route outside the 'web' middleware group to avoid CSRF token
+        // verification on the POST (RFC 8058 one-click) endpoint.
         Subscriber::routes();
 
         Subscriber::onUnsubscribeFromMailingList(function ($notifiable, string $mailingList) {

@@ -21,12 +21,12 @@ trait SubscribableNotification
             : null;
         $listValue = $list instanceof \BackedEnum ? $list->value : $list;
 
+        $unsubscribeUrl = $notifiable->unsubscribeLink($listValue);
+
         if ($listValue !== null) {
-            $message->viewData['unsubscribeLink'] = $notifiable->unsubscribeLink($listValue);
+            $message->viewData['unsubscribeLink'] = $unsubscribeUrl;
         }
         $message->viewData['unsubscribeLinkForAll'] = $notifiable->unsubscribeLink();
-
-        $unsubscribeUrl = $notifiable->unsubscribeLink($listValue);
 
         return $message->withSymfonyMessage(function (Email $email) use ($unsubscribeUrl) {
             $email->getHeaders()->addTextHeader('List-Unsubscribe', sprintf('<%s>', $unsubscribeUrl));
