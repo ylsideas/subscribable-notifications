@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
 use YlsIdeas\SubscribableNotifications\Messages\SubscribableMailMessage;
@@ -24,10 +24,16 @@ class SubscribableNotificationTest extends TestCase
      *     CheckSubscriptionStatusBeforeSendingNotifications.
      *   - Your notification implements CheckNotifiableSubscriptionStatus
      *     and returns true from checkMailSubscriptionStatus().
+     *
+     * Note: use Mail::fake() rather than Notification::fake() here.
+     * Notification::fake() bypasses the NotificationSending event, which
+     * is where this package's subscription gate lives. Mail::fake()
+     * intercepts at the transport layer while still letting the full
+     * notification pipeline — and the gate — run normally.
      */
     public function test_subscribed_user_receives_notification(): void
     {
-        Notification::fake();
+        Mail::fake();
         Subscriber::fake()->alwaysSubscribed();
 
         // TODO: Replace with your notifiable model factory
@@ -36,8 +42,7 @@ class SubscribableNotificationTest extends TestCase
         // TODO: Replace with your notification class
         $user->notify(new \App\Notifications\YourNotification());
 
-        // TODO: Replace with your notification class
-        Notification::assertSentTo($user, \App\Notifications\YourNotification::class);
+        Mail::assertSentCount(1);
     }
 
     /**
@@ -47,7 +52,7 @@ class SubscribableNotificationTest extends TestCase
      */
     public function test_globally_unsubscribed_user_does_not_receive_notification(): void
     {
-        Notification::fake();
+        Mail::fake();
         Subscriber::fake()->alwaysUnsubscribed();
 
         // TODO: Replace with your notifiable model factory
@@ -56,8 +61,7 @@ class SubscribableNotificationTest extends TestCase
         // TODO: Replace with your notification class
         $user->notify(new \App\Notifications\YourNotification());
 
-        // TODO: Replace with your notification class
-        Notification::assertNotSentTo($user, \App\Notifications\YourNotification::class);
+        Mail::assertNothingSent();
     }
 
     /**
@@ -69,11 +73,11 @@ class SubscribableNotificationTest extends TestCase
      */
     public function test_user_unsubscribed_from_mailing_list_does_not_receive_notification(): void
     {
-        Notification::fake();
+        Mail::fake();
 
         // alwaysUnsubscribed() makes both the global and per-list checks return false.
-        // To test only per-list gating, configure a real handler in your service provider
-        // that returns false only for the specific list.
+        // To test only per-list gating, configure real onCheckSubscriptionStatus* handlers
+        // in your test setup that return false only for the specific list.
         Subscriber::fake()->alwaysUnsubscribed();
 
         // TODO: Replace with your notifiable model factory
@@ -82,8 +86,7 @@ class SubscribableNotificationTest extends TestCase
         // TODO: Replace with a notification that implements AppliesToMailingList
         $user->notify(new \App\Notifications\YourNotification());
 
-        // TODO: Replace with your notification class
-        Notification::assertNotSentTo($user, \App\Notifications\YourNotification::class);
+        Mail::assertNothingSent();
     }
 
     /**

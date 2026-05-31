@@ -59,7 +59,7 @@
                 "YlsIdeas\\SubscribableNotifications\\SubscribableServiceProvider"
             ],
             "aliases": {
-                "Subscriber": "YlsIdeas\\Facades\\Subscriber"
+                "Subscriber": "YlsIdeas\\SubscribableNotifications\\Facades\\Subscriber"
             }
         }
     },

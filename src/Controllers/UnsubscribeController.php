@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use YlsIdeas\SubscribableNotifications\Contracts\CanUnsubscribe;
+use YlsIdeas\SubscribableNotifications\Contracts\SubscriberContract;
 use YlsIdeas\SubscribableNotifications\Events\UserUnsubscribed;
 use YlsIdeas\SubscribableNotifications\Events\UserUnsubscribing;
-use YlsIdeas\SubscribableNotifications\Subscriber;
 
 final class UnsubscribeController extends Controller
 {
-    public function __construct(private readonly Subscriber $subscriber)
+    public function __construct(private readonly SubscriberContract $subscriber)
     {
         $this->middleware('signed');
     }

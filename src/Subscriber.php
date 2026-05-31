@@ -5,8 +5,9 @@ namespace YlsIdeas\SubscribableNotifications;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
+use YlsIdeas\SubscribableNotifications\Contracts\SubscriberContract;
 
-final class Subscriber
+final class Subscriber implements SubscriberContract
 {
     public string $uri = 'unsubscribe/{subscriberType}/{subscriberId}/{mailingList?}';
     public string $handler = '\YlsIdeas\SubscribableNotifications\Controllers\UnsubscribeController';
@@ -92,22 +93,39 @@ final class Subscriber
 
     public function unsubscribeFromMailingList(mixed $user, string $mailingList): void
     {
+        if ($this->onUnsubscribeFromMailingList === null) {
+            throw new \LogicException('No handler registered for mailing-list unsubscribes. Call Subscriber::onUnsubscribeFromMailingList() in your service provider.');
+        }
         ($this->onUnsubscribeFromMailingList)($user, $mailingList);
     }
 
     public function unsubscribeFromAllMailingLists(mixed $user): void
     {
+        if ($this->onUnsubscribeFromAllMailingLists === null) {
+            throw new \LogicException('No handler registered for global unsubscribes. Call Subscriber::onUnsubscribeFromAllMailingLists() in your service provider.');
+        }
         ($this->onUnsubscribeFromAllMailingLists)($user);
     }
 
     public function complete(mixed $user, ?string $mailingList = null): mixed
     {
+        if ($this->onCompletion === null) {
+            throw new \LogicException('No completion handler registered. Call Subscriber::onCompletion() in your service provider.');
+        }
         return ($this->onCompletion)($user, $mailingList);
     }
 
     public function checkSubscriptionStatus(mixed $user, ?string $mailingList = null): bool
     {
+        if ($this->onCheckSubscriptionStatusForAllMailingLists === null) {
+            return true;
+        }
+
         if ($mailingList !== null) {
+            if ($this->onCheckSubscriptionStatusForMailingLists === null) {
+                return (bool) ($this->onCheckSubscriptionStatusForAllMailingLists)($user);
+            }
+
             return (bool) ($this->onCheckSubscriptionStatusForAllMailingLists)($user)
                 && (bool) ($this->onCheckSubscriptionStatusForMailingLists)($user, $mailingList);
         }

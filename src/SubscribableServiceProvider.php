@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use YlsIdeas\SubscribableNotifications\Contracts\CheckNotifiableSubscriptionStatus;
 use YlsIdeas\SubscribableNotifications\Contracts\CheckSubscriptionStatusBeforeSendingNotifications;
+use YlsIdeas\SubscribableNotifications\Contracts\SubscriberContract;
 
 final class SubscribableServiceProvider extends ServiceProvider
 {
@@ -45,5 +46,6 @@ final class SubscribableServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(Subscriber::class, fn () => new Subscriber($this->app));
+        $this->app->alias(Subscriber::class, SubscriberContract::class);
     }
 }

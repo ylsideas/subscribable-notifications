@@ -372,6 +372,36 @@ Subscriber::fake()->alwaysUnsubscribed(); // all checkSubscriptionStatus calls r
 Subscriber::fake()->alwaysSubscribed();   // all checkSubscriptionStatus calls return true (default)
 ```
 
+### Testing subscription gating (`Mail::fake()` vs `Notification::fake()`)
+
+When testing whether an unsubscribed user is silently dropped, use `Mail::fake()` — **not** `Notification::fake()`. The subscription gate runs inside a `NotificationSending` event listener; `Notification::fake()` bypasses that event entirely, so the gate never fires and every notification appears to be sent regardless of subscription status.
+
+`Mail::fake()` intercepts at the transport layer, leaving the full notification pipeline — including the `NotificationSending` event — running normally:
+
+```php
+use Illuminate\Support\Facades\Mail;
+
+it('does not send mail to unsubscribed users', function () {
+    Mail::fake();
+    Subscriber::fake()->alwaysUnsubscribed();
+
+    $user = User::factory()->create();
+    $user->notify(new WeeklyDigest());
+
+    Mail::assertNothingSent();
+});
+
+it('sends mail to subscribed users', function () {
+    Mail::fake();
+    Subscriber::fake()->alwaysSubscribed();
+
+    $user = User::factory()->create();
+    $user->notify(new WeeklyDigest());
+
+    Mail::assertSentCount(1);
+});
+```
+
 ## Running the test suite
 
 ```bash

@@ -4,8 +4,9 @@ namespace YlsIdeas\SubscribableNotifications\Testing;
 
 use Illuminate\Http\Response;
 use PHPUnit\Framework\Assert;
+use YlsIdeas\SubscribableNotifications\Contracts\SubscriberContract;
 
-final class FakeSubscriber
+final class FakeSubscriber implements SubscriberContract
 {
     public string $routeName = 'unsubscribe';
 
@@ -20,6 +21,11 @@ final class FakeSubscriber
 
     public function legacyRoutes(string $defaultModel, mixed $router = null, string|false $throttle = '60,1'): void
     {
+    }
+
+    public function getLegacySubscriberType(): ?string
+    {
+        return null;
     }
 
     public function routeName(): string

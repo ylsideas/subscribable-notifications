@@ -4,11 +4,11 @@ namespace YlsIdeas\SubscribableNotifications\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use YlsIdeas\SubscribableNotifications\Subscriber;
+use YlsIdeas\SubscribableNotifications\Contracts\SubscriberContract;
 
 final class LegacyUnsubscribeController extends Controller
 {
-    public function __construct(private readonly Subscriber $subscriber)
+    public function __construct(private readonly SubscriberContract $subscriber)
     {
         $this->middleware('signed');
     }
