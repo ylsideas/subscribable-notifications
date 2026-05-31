@@ -74,11 +74,22 @@ class Subscriber
     }
 
     /**
+     * @deprecated v1.x will be removed in v2.0. Model resolution is now polymorphic via the URL.
+     *             Remove all Subscriber::userModel() calls and add a morph map instead.
+     *             See the upgrade guide: UPGRADE.md
+     *
      * @param string|null $model
      * @return string|null
      */
     public function userModel(?string $model = null)
     {
+        trigger_error(
+            'Subscriber::userModel() is deprecated and will be removed in v2.0.'
+                . ' Model resolution is now polymorphic via the URL.'
+                . ' Remove all userModel() calls and register a morph map instead.',
+            E_USER_DEPRECATED
+        );
+
         if ($model) {
             $this->userModel = $model;
 
