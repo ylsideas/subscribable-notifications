@@ -22,6 +22,11 @@ final class SubscribableServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../stubs/SubscribableServiceProvider.stub' => app_path('Providers/SubscribableServiceProvider.php'),
             ], 'subscriber-provider');
+
+            $this->publishes([
+                __DIR__.'/../stubs/tests/UnsubscribeRouteTest.stub' => base_path('tests/Feature/UnsubscribeRouteTest.php'),
+                __DIR__.'/../stubs/tests/SubscribableNotificationTest.stub' => base_path('tests/Feature/SubscribableNotificationTest.php'),
+            ], 'subscriber-tests');
         }
 
         Event::listen(NotificationSending::class, function (NotificationSending $event) {

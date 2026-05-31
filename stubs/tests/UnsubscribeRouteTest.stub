@@ -1,0 +1,87 @@
+<?php
+
+namespace Tests\Feature;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
+
+// TODO: Import your notifiable model:
+// use App\Models\User;
+
+class UnsubscribeRouteTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_user_can_unsubscribe_from_all_mailing_lists(): void
+    {
+        $fake = Subscriber::fake();
+
+        // TODO: Replace with your notifiable model factory
+        $user = \App\Models\User::factory()->create();
+
+        $this->get($user->unsubscribeLink())->assertSuccessful();
+
+        $fake->assertUnsubscribedFromAll($user);
+    }
+
+    public function test_user_can_unsubscribe_from_a_specific_mailing_list(): void
+    {
+        $fake = Subscriber::fake();
+
+        // TODO: Replace with your notifiable model factory
+        $user = \App\Models\User::factory()->create();
+
+        // TODO: Replace with a real mailing list identifier used by your application
+        $this->get($user->unsubscribeLink('your-mailing-list'))->assertSuccessful();
+
+        $fake->assertUnsubscribedFromMailingList($user, 'your-mailing-list');
+    }
+
+    public function test_rfc8058_one_click_post_unsubscribes_user(): void
+    {
+        $fake = Subscriber::fake();
+
+        // TODO: Replace with your notifiable model factory
+        $user = \App\Models\User::factory()->create();
+
+        $this->post($user->unsubscribeLink(), ['List-Unsubscribe' => 'One-Click'])
+            ->assertNoContent();
+
+        $fake->assertUnsubscribedFromAll($user);
+    }
+
+    public function test_rfc8058_one_click_post_unsubscribes_user_from_mailing_list(): void
+    {
+        $fake = Subscriber::fake();
+
+        // TODO: Replace with your notifiable model factory
+        $user = \App\Models\User::factory()->create();
+
+        // TODO: Replace with a real mailing list identifier used by your application
+        $this->post($user->unsubscribeLink('your-mailing-list'), ['List-Unsubscribe' => 'One-Click'])
+            ->assertNoContent();
+
+        $fake->assertUnsubscribedFromMailingList($user, 'your-mailing-list');
+    }
+
+    public function test_post_without_rfc8058_body_is_rejected(): void
+    {
+        Subscriber::fake();
+
+        // TODO: Replace with your notifiable model factory
+        $user = \App\Models\User::factory()->create();
+
+        $this->post($user->unsubscribeLink())->assertBadRequest();
+    }
+
+    public function test_tampered_unsubscribe_url_is_rejected(): void
+    {
+        Subscriber::fake();
+
+        // TODO: Replace with your notifiable model factory
+        $user = \App\Models\User::factory()->create();
+
+        $this->get($user->unsubscribeLink() . '&tampered=1')->assertForbidden();
+    }
+}

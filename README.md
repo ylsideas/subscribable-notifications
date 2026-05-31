@@ -313,6 +313,25 @@ This creates `resources/views/vendor/subscriber/html.blade.php` and `text.blade.
 
 ## Testing
 
+### Scaffolding your tests
+
+Publish ready-to-customise test stubs into your application's `tests/Feature/` directory:
+
+```bash
+php artisan vendor:publish --tag=subscriber-tests
+```
+
+This creates two files:
+
+| File | What it covers |
+|------|----------------|
+| `tests/Feature/UnsubscribeRouteTest.php` | GET and POST unsubscribe routes, RFC 8058 body validation, tampered-URL rejection |
+| `tests/Feature/SubscribableNotificationTest.php` | Subscription gating (subscribed sends, unsubscribed dropped), view data presence |
+
+Each file is annotated with `// TODO:` markers wherever you need to substitute your own model or notification class. The stubs use `Subscriber::fake()` so no real database handlers need to be configured.
+
+### Using the fake
+
 Use `Subscriber::fake()` in your tests to swap in a fake implementation and make assertions without needing real handlers configured:
 
 ```php
