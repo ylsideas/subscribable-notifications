@@ -3,23 +3,18 @@
 namespace YlsIdeas\SubscribableNotifications;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 
 class Subscriber
 {
-    /**
-     * @var string
-     */
     public $uri = 'unsubscribe/{subscriberType}/{subscriberId}/{mailingList?}';
-    /**
-     * @var string
-     */
     public $hander = '\YlsIdeas\SubscribableNotifications\Controllers\UnsubscribeController';
-    /**
-     * @var string
-     */
     public $routeName = 'unsubscribe';
+
+    /** Morph type stored when legacyRoutes() is called — used by LegacyUnsubscribeController. */
+    public ?string $legacySubscriberType = null;
     /**
      * @var callable
      */
@@ -51,15 +46,26 @@ class Subscriber
         $this->app = $app;
     }
 
-    public function routes($router = null)
+    public function routes($router = null): void
     {
         $router = $router ?? $this->app->make('router');
+        $router->match(['GET', 'POST'], $this->uri, $this->hander)
+            ->name($this->routeName)
+            ->where('subscriberType', '[^\d/][^/]*');
+    }
+
+    public function legacyRoutes(string $defaultModel, $router = null): void
+    {
+        $router = $router ?? $this->app->make('router');
+
+        $morphMap = Relation::morphMap();
+        $this->legacySubscriberType = array_search($defaultModel, $morphMap, true) ?: $defaultModel;
+
         $router->match(
             ['GET', 'POST'],
-            $this->uri,
-            $this->hander
-        )
-            ->name($this->routeName);
+            'unsubscribe/{subscriberId}/{mailingList?}',
+            '\YlsIdeas\SubscribableNotifications\Controllers\LegacyUnsubscribeController'
+        )->name($this->routeName . '.legacy');
     }
 
     /**
