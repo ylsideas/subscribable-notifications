@@ -1,5 +1,9 @@
 <?php
 
+// @deprecated This stub and SubscribableApplicationServiceProvider will be removed in v2.0.
+// After upgrading to v2, run `php artisan vendor:publish --tag=subscriber-provider` to get
+// the new plain-stub and migrate your callbacks. See UPGRADE.md for details.
+
 namespace App\Providers;
 
 use YlsIdeas\SubscribableNotifications\SubscribableApplicationServiceProvider;
