@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @method static void routes()
  * @method static string routeName()
- * @method static mixed userModel(string $model = null)
+ * @method static mixed userModel(string $model = null) @deprecated v1.x will be removed in v2.0. Remove all userModel() calls; model resolution is now polymorphic via the URL.
  * @method static void onCompletion(callable|string $handler)
  * @method static void onUnsubscribeFromMailingList(callable|string $handler)
  * @method static void onUnsubscribeFromAllMailingLists(callable|string $handler)

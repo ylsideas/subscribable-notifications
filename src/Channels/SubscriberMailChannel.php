@@ -11,6 +11,12 @@ use YlsIdeas\SubscribableNotifications\Contracts\CanUnsubscribe;
 use YlsIdeas\SubscribableNotifications\Contracts\CheckNotifiableSubscriptionStatus;
 use YlsIdeas\SubscribableNotifications\Contracts\CheckSubscriptionStatusBeforeSendingNotifications;
 
+/**
+ * @deprecated v1.x will be removed in v2.0. Automatic unsubscribe-link injection via a custom
+ *             MailChannel is replaced by explicit opt-in: return SubscribableMailMessage::via($notifiable, $this)
+ *             from your notification's toMail() method instead.
+ *             See the upgrade guide: UPGRADE.md
+ */
 class SubscriberMailChannel extends MailChannel
 {
     /**
@@ -29,6 +35,13 @@ class SubscriberMailChannel extends MailChannel
      */
     public function send($notifiable, Notification $notification)
     {
+        trigger_error(
+            'SubscriberMailChannel is deprecated and will be removed in v2.0.'
+                . ' Return SubscribableMailMessage::via($notifiable, $this) from your notification\'s'
+                . ' toMail() method to opt in to unsubscribe-link injection explicitly.',
+            E_USER_DEPRECATED
+        );
+
         // Check if the user would want the mail
         if ($notifiable instanceof CheckSubscriptionStatusBeforeSendingNotifications &&
             $notification instanceof CheckNotifiableSubscriptionStatus &&

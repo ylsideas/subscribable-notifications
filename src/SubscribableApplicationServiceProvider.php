@@ -4,6 +4,11 @@ namespace YlsIdeas\SubscribableNotifications;
 
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * @deprecated v1.x will be removed in v2.0. Publish the subscriber-provider stub and configure
+ *             Subscriber callbacks directly in your own service provider's boot() method instead.
+ *             See the upgrade guide: UPGRADE.md
+ */
 abstract class SubscribableApplicationServiceProvider extends ServiceProvider
 {
     /**
@@ -18,6 +23,15 @@ abstract class SubscribableApplicationServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        trigger_error(
+            sprintf(
+                '%s is deprecated and will be removed in v2.0. Publish the subscriber-provider stub'
+                    . ' and configure Subscriber callbacks directly in your boot() method instead.',
+                static::class
+            ),
+            E_USER_DEPRECATED
+        );
+
         if ($this->loadRoutes === true) {
             $this->loadRoutes();
         }
