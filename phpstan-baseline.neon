@@ -5,3 +5,8 @@ parameters:
 			identifier: trait.unused
 			count: 1
 			path: src/MailSubscriber.php
+		-
+			message: '#^Access to constant on deprecated class YlsIdeas\\SubscribableNotifications\\Channels\\SubscriberMailChannel#'
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: src/SubscribableServiceProvider.php
