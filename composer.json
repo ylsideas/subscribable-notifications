@@ -1,6 +1,6 @@
 {
     "name": "ylsideas/subscribable-notifications",
-    "description": "A Laravel package for adding unsubscribe links to notifications",
+    "description": "A Laravel package for adding RFC 8058 compliant unsubscribe links to notifications",
     "keywords": [
         "ylsideas",
         "unsubscribable-notification",
@@ -17,11 +17,11 @@
         }
     ],
     "require": {
-        "php": "^8.3",
-        "illuminate/contracts": "13.*|12.*|11.*"
+        "php": "^8.4",
+        "illuminate/contracts": "13.*|12.*"
     },
     "require-dev": {
-        "orchestra/testbench": "^9.17.0|^10.0|^11.0",
+        "orchestra/testbench": "^10.0|^11.0",
         "nunomaduro/collision": "^8.0",
         "larastan/larastan": "^2.0|^3.0",
         "pestphp/pest": "^2.34|^3.0|^4.0",
@@ -59,7 +59,7 @@
                 "YlsIdeas\\SubscribableNotifications\\SubscribableServiceProvider"
             ],
             "aliases": {
-                "Subscriber": "YlsIdeas\\Facades\\Subscriber"
+                "Subscriber": "YlsIdeas\\SubscribableNotifications\\Facades\\Subscriber"
             }
         }
     },

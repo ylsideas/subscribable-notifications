@@ -32,7 +32,7 @@ class MailSubscriberTest extends TestCase
 
     public function test_it_generates_a_signed_url_for_users_to_unsubscribe()
     {
-        Route::get('unsubscribe/{subscriber}/{mailingList?}', function () {
+        Route::get('unsubscribe/{subscriberType}/{subscriberId}/{mailingList?}', function () {
         })->name('unsubscribe');
 
         /** @var DummyUser $user */
@@ -45,16 +45,18 @@ class MailSubscriberTest extends TestCase
 
         $url = $user->unsubscribeLink();
 
-
         $this->assertEquals(
-            URL::signedRoute('unsubscribe', ['subscriber' => 1]),
+            URL::signedRoute('unsubscribe', [
+                'subscriberType' => $user->getMorphClass(),
+                'subscriberId' => 1,
+            ]),
             $url
         );
     }
 
     public function test_it_generates_a_signed_url_for_users_to_unsubscribe_from_a_mailing_list()
     {
-        Route::get('unsubscribe/{subscriber}/{mailingList?}', function () {
+        Route::get('unsubscribe/{subscriberType}/{subscriberId}/{mailingList?}', function () {
         })->name('unsubscribe');
 
         /** @var DummyUser $user */
@@ -68,44 +70,42 @@ class MailSubscriberTest extends TestCase
         $url = $user->unsubscribeLink('test');
 
         $this->assertEquals(
-            URL::signedRoute('unsubscribe', ['subscriber' => 1, 'mailingList' => 'test']),
+            URL::signedRoute('unsubscribe', [
+                'subscriberType' => $user->getMorphClass(),
+                'subscriberId' => 1,
+                'mailingList' => 'test',
+            ]),
             $url
         );
     }
 
     public function test_it_can_check_its_subscription_status_for_all_mailing_lists()
     {
-        /** @var DummyUser $user */
         $user = DummyUser::make([
             'name' => 'test',
             'email' => 'test@testing.local',
             'password' => 'test',
         ]);
 
-        $notification = new DummyNotification();
+        $fake = Subscriber::fake()->alwaysSubscribed();
 
-        Subscriber::shouldReceive('checkSubscriptionStatus')
-            ->with($user, null)
-            ->andReturn(true);
+        $this->assertTrue($user->mailSubscriptionStatus(new DummyNotification()));
 
-        $this->assertTrue($user->mailSubscriptionStatus($notification));
+        $fake->assertCheckedSubscriptionStatus($user, null);
     }
 
     public function test_it_can_check_its_subscription_status_for_one_mailing_list()
     {
-        /** @var DummyUser $user */
         $user = DummyUser::make([
             'name' => 'test',
             'email' => 'test@testing.local',
             'password' => 'test',
         ]);
 
-        $notification = new DummyNotificationWithMailingList();
+        $fake = Subscriber::fake()->alwaysSubscribed();
 
-        Subscriber::shouldReceive('checkSubscriptionStatus')
-            ->with($user, 'testing-list')
-            ->andReturn(true);
+        $this->assertTrue($user->mailSubscriptionStatus(new DummyNotificationWithMailingList()));
 
-        $this->assertTrue($user->mailSubscriptionStatus($notification));
+        $fake->assertCheckedSubscriptionStatus($user, 'testing-list');
     }
 }

@@ -2,17 +2,16 @@
 
 namespace YlsIdeas\SubscribableNotifications;
 
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Notifications\Channels\MailChannel;
+use Illuminate\Notifications\Events\NotificationSending;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
-use YlsIdeas\SubscribableNotifications\Channels\SubscriberMailChannel;
+use YlsIdeas\SubscribableNotifications\Contracts\CheckNotifiableSubscriptionStatus;
+use YlsIdeas\SubscribableNotifications\Contracts\CheckSubscriptionStatusBeforeSendingNotifications;
+use YlsIdeas\SubscribableNotifications\Contracts\SubscriberContract;
 
-class SubscribableServiceProvider extends ServiceProvider
+final class SubscribableServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap the application services.
-     */
-    public function boot()
+    public function boot(): void
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'subscriber');
 
@@ -24,18 +23,29 @@ class SubscribableServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../stubs/SubscribableServiceProvider.stub' => app_path('Providers/SubscribableServiceProvider.php'),
             ], 'subscriber-provider');
+
+            $this->publishes([
+                __DIR__.'/../stubs/tests/UnsubscribeRouteTest.stub' => base_path('tests/Feature/UnsubscribeRouteTest.php'),
+                __DIR__.'/../stubs/tests/SubscribableNotificationTest.stub' => base_path('tests/Feature/SubscribableNotificationTest.php'),
+            ], 'subscriber-tests');
         }
+
+        Event::listen(NotificationSending::class, function (NotificationSending $event) {
+            if ($event->channel !== 'mail') {
+                return;
+            }
+            if ($event->notifiable instanceof CheckSubscriptionStatusBeforeSendingNotifications &&
+                $event->notification instanceof CheckNotifiableSubscriptionStatus &&
+                $event->notification->checkMailSubscriptionStatus() &&
+                ! $event->notifiable->mailSubscriptionStatus($event->notification)) {
+                return false;
+            }
+        });
     }
 
-    /**
-     * Register the application services.
-     */
-    public function register()
+    public function register(): void
     {
-        $this->app->bind(MailChannel::class, SubscriberMailChannel::class);
-        $this->app->singleton(Subscriber::class, function (Application $app) {
-            /** @phpstan-ignore-next-line */
-            return new Subscriber($app);
-        });
+        $this->app->singleton(Subscriber::class, fn () => new Subscriber($this->app));
+        $this->app->alias(Subscriber::class, SubscriberContract::class);
     }
 }

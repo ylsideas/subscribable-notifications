@@ -4,6 +4,8 @@ namespace YlsIdeas\SubscribableNotifications\Tests\Support;
 
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use YlsIdeas\SubscribableNotifications\Contracts\CanUnsubscribe;
+use YlsIdeas\SubscribableNotifications\Messages\SubscribableMailMessage;
 
 class DummyNotification extends Notification
 {
@@ -11,25 +13,11 @@ class DummyNotification extends Notification
 
     public $useMailable = false;
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param mixed $notifiable
-     *
-     * @return array
-     */
     public function via($notifiable)
     {
         return ['mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     *
-     * @param mixed $notifiable
-     *
-     * @return \Illuminate\Notifications\Messages\MailMessage
-     */
     public function toMail($notifiable)
     {
         if ($this->useView !== null) {
@@ -44,7 +32,11 @@ class DummyNotification extends Notification
             return new DummyMailable();
         }
 
-        return (new MailMessage())
+        $message = $notifiable instanceof CanUnsubscribe
+            ? SubscribableMailMessage::via($notifiable, $this)
+            : new MailMessage();
+
+        return $message
             ->line('The introduction to the notification.')
             ->action('Notification Action', url('/'))
             ->line('Thank you for using our application!');

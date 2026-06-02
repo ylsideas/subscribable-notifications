@@ -1,4 +1,4 @@
-@component('subscriber::mail.text.message')
+<x-mail::message>
 {{-- Greeting --}}
 @if (! empty($greeting))
 # {{ $greeting }}
@@ -19,14 +19,10 @@
 {{-- Action Button --}}
 @isset($actionText)
 <?php
-    switch ($level) {
-        case 'success':
-        case 'error':
-            $color = $level;
-            break;
-        default:
-            $color = 'primary';
-    }
+    $color = match ($level) {
+        'success', 'error' => $level,
+        default => 'primary',
+    };
 ?>
 @component('mail::button', ['url' => $actionUrl, 'color' => $color])
 {{ $actionText }}
@@ -43,36 +39,28 @@
 @if (! empty($salutation))
 {{ $salutation }}
 @else
-@lang('Regards'),<br>{{ config('app.name') }}
+@lang('Regards,')
+{{ config('app.name') }}
+@endif
+
+{{-- Unsubscribe --}}
+@if($unsubscribeLink ?? false)
+@lang("If you no longer want to receive this type of email in the future go to :link.\n", ['link' => $unsubscribeLink])
+@endif
+@if($unsubscribeLinkForAll ?? false)
+@lang("To no longer receive any future emails go to :link.\n", ['link' => $unsubscribeLinkForAll])
 @endif
 
 {{-- Subcopy --}}
 @isset($actionText)
-@slot('subcopy')
+<x-slot:subcopy>
 @lang(
-    "If you’re having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
-    'into your web browser: [:actionURL](:actionURL).',
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
+    'into your web browser:',
     [
         'actionText' => $actionText,
-        'actionURL' => $actionUrl,
     ]
-)
-@endslot
+) {{ $displayableActionUrl }}
+</x-slot:subcopy>
 @endisset
-
-@slot('unsubscribe')
-@if($unsubscribeLink ?? false)
-@lang(
-    "If you no longer want to receive this type of email in the future go to :link.\n",
-    ['link' => $unsubscribeLink]
-)
-@endif
-@if($unsubscribeLinkForAll ?? false)
-@lang(
-    "To no longer receive any future emails go to :link.\n",
-    ['link' => $unsubscribeLinkForAll]
-)
-@endif
-@endslot
-
-@endcomponent
+</x-mail::message>

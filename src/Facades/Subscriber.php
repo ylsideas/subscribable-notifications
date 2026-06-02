@@ -4,15 +4,17 @@ namespace YlsIdeas\SubscribableNotifications\Facades;
 
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Facade;
+use YlsIdeas\SubscribableNotifications\Contracts\SubscriberContract;
+use YlsIdeas\SubscribableNotifications\Testing\FakeSubscriber;
 
 /**
  * Class Subscriber.
  *
  * @see \YlsIdeas\SubscribableNotifications\Subscriber
  *
- * @method static void routes()
+ * @method static void routes(mixed $router = null, string|false $throttle = '60,1')
+ * @method static void legacyRoutes(string $defaultModel, mixed $router = null, string|false $throttle = '60,1')
  * @method static string routeName()
- * @method static mixed userModel(string $model = null)
  * @method static void onCompletion(callable|string $handler)
  * @method static void onUnsubscribeFromMailingList(callable|string $handler)
  * @method static void onUnsubscribeFromAllMailingLists(callable|string $handler)
@@ -25,8 +27,23 @@ use Illuminate\Support\Facades\Facade;
  */
 class Subscriber extends Facade
 {
-    protected static function getFacadeAccessor()
+    protected static function getFacadeAccessor(): string
     {
         return \YlsIdeas\SubscribableNotifications\Subscriber::class;
+    }
+
+    public static function fake(): FakeSubscriber
+    {
+        $fake = new FakeSubscriber();
+
+        $app = static::getFacadeApplication();
+        $app->forgetInstance(\YlsIdeas\SubscribableNotifications\Subscriber::class);
+        $app->forgetInstance(SubscriberContract::class);
+        $app->instance(\YlsIdeas\SubscribableNotifications\Subscriber::class, $fake);
+        $app->instance(SubscriberContract::class, $fake);
+
+        static::swap($fake);
+
+        return $fake;
     }
 }

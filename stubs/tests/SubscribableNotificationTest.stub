@@ -1,0 +1,132 @@
+<?php
+
+namespace Tests\Feature;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
+use Tests\TestCase;
+use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
+use YlsIdeas\SubscribableNotifications\Messages\SubscribableMailMessage;
+
+// TODO: Import your notifiable model and notification class:
+// use App\Models\User;
+// use App\Notifications\YourNotification;
+
+class SubscribableNotificationTest extends TestCase
+{
+    use RefreshDatabase;
+
+    /**
+     * Verify that a subscribed user receives the notification.
+     *
+     * Requires:
+     *   - Your notifiable model implements CanUnsubscribe and
+     *     CheckSubscriptionStatusBeforeSendingNotifications.
+     *   - Your notification implements CheckNotifiableSubscriptionStatus
+     *     and returns true from checkMailSubscriptionStatus().
+     *
+     * Note: use Mail::fake() rather than Notification::fake() here.
+     * Notification::fake() bypasses the NotificationSending event, which
+     * is where this package's subscription gate lives. Mail::fake()
+     * intercepts at the transport layer while still letting the full
+     * notification pipeline — and the gate — run normally.
+     */
+    public function test_subscribed_user_receives_notification(): void
+    {
+        Mail::fake();
+        Subscriber::fake()->alwaysSubscribed();
+
+        // TODO: Replace with your notifiable model factory
+        $user = \App\Models\User::factory()->create();
+
+        // TODO: Replace with your notification class
+        $user->notify(new \App\Notifications\YourNotification());
+
+        Mail::assertSentCount(1);
+    }
+
+    /**
+     * Verify that a globally unsubscribed user does not receive the notification.
+     *
+     * Requires the same model and notification setup as the test above.
+     */
+    public function test_globally_unsubscribed_user_does_not_receive_notification(): void
+    {
+        Mail::fake();
+        Subscriber::fake()->alwaysUnsubscribed();
+
+        // TODO: Replace with your notifiable model factory
+        $user = \App\Models\User::factory()->create();
+
+        // TODO: Replace with your notification class
+        $user->notify(new \App\Notifications\YourNotification());
+
+        Mail::assertNothingSent();
+    }
+
+    /**
+     * Verify that a user unsubscribed from a specific list does not receive
+     * notifications that target that list.
+     *
+     * Requires your notification to implement AppliesToMailingList in addition
+     * to CheckNotifiableSubscriptionStatus.
+     */
+    public function test_user_unsubscribed_from_mailing_list_does_not_receive_notification(): void
+    {
+        Mail::fake();
+
+        // alwaysUnsubscribed() makes both the global and per-list checks return false.
+        // To test only per-list gating, configure real onCheckSubscriptionStatus* handlers
+        // in your test setup that return false only for the specific list.
+        Subscriber::fake()->alwaysUnsubscribed();
+
+        // TODO: Replace with your notifiable model factory
+        $user = \App\Models\User::factory()->create();
+
+        // TODO: Replace with a notification that implements AppliesToMailingList
+        $user->notify(new \App\Notifications\YourNotification());
+
+        Mail::assertNothingSent();
+    }
+
+    /**
+     * Verify the mail message includes the expected unsubscribe view data.
+     *
+     * Tests the output of your notification's toMail() method directly, without
+     * going through the notification channel pipeline.
+     */
+    public function test_notification_email_includes_unsubscribe_links(): void
+    {
+        // TODO: Replace with your notifiable model factory
+        $user = \App\Models\User::factory()->create();
+
+        // TODO: Replace with your notification class
+        $notification = new \App\Notifications\YourNotification();
+
+        /** @var SubscribableMailMessage $message */
+        $message = $notification->toMail($user);
+
+        $this->assertInstanceOf(SubscribableMailMessage::class, $message);
+        $this->assertArrayHasKey('unsubscribeLinkForAll', $message->viewData);
+    }
+
+    /**
+     * Verify the mail message includes a per-list unsubscribe link when the
+     * notification implements AppliesToMailingList.
+     */
+    public function test_mailing_list_notification_includes_list_specific_unsubscribe_link(): void
+    {
+        // TODO: Replace with your notifiable model factory
+        $user = \App\Models\User::factory()->create();
+
+        // TODO: Replace with a notification that implements AppliesToMailingList
+        $notification = new \App\Notifications\YourNotification();
+
+        /** @var SubscribableMailMessage $message */
+        $message = $notification->toMail($user);
+
+        $this->assertInstanceOf(SubscribableMailMessage::class, $message);
+        $this->assertArrayHasKey('unsubscribeLink', $message->viewData);
+        $this->assertArrayHasKey('unsubscribeLinkForAll', $message->viewData);
+    }
+}

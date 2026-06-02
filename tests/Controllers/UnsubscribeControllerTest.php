@@ -48,8 +48,6 @@ class UnsubscribeControllerTest extends TestCase
             'password' => 'test',
         ]);
 
-        Subscriber::userModel(DummyUser::class);
-
         Subscriber::onUnsubscribeFromAllMailingLists(
             function ($user) use (&$expected, $expectedUser) {
                 $expected = true;
@@ -76,8 +74,6 @@ class UnsubscribeControllerTest extends TestCase
             'email' => 'test@testing.local',
             'password' => 'test',
         ]);
-
-        Subscriber::userModel(DummyUser::class);
 
         Subscriber::onUnsubscribeFromMailingList(
             function ($user, $mailingList) use (&$expected, $expectedUser) {
@@ -137,7 +133,11 @@ class UnsubscribeControllerTest extends TestCase
         $this->get(
             URL::signedRoute(
                 Subscriber::routeName(),
-                ['subscriber' => 1, 'mailingList' => 'test']
+                [
+                    'subscriberType' => DummyUser::class,
+                    'subscriberId' => 999,
+                    'mailingList' => 'test',
+                ]
             )
         )
             ->assertStatus(403);
@@ -164,5 +164,80 @@ class UnsubscribeControllerTest extends TestCase
 
         Event::assertDispatched(UserUnsubscribing::class);
         Event::assertDispatched(UserUnsubscribed::class);
+    }
+
+    public function test_it_returns_200_for_rfc8058_one_click_post_unsubscribe()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var DummyUser $user */
+        $expectedUser = DummyUser::create([
+            'name' => 'test',
+            'email' => 'test@testing.local',
+            'password' => 'test',
+        ]);
+
+        $called = false;
+        Subscriber::onUnsubscribeFromAllMailingLists(function ($user) use (&$called) {
+            $called = true;
+        });
+
+        $this->post($expectedUser->unsubscribeLink(), ['List-Unsubscribe' => 'One-Click'])
+            ->assertNoContent();
+
+        $this->assertTrue($called);
+    }
+
+    public function test_it_returns_200_for_rfc8058_one_click_post_unsubscribe_from_mailing_list()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var DummyUser $user */
+        $expectedUser = DummyUser::create([
+            'name' => 'test',
+            'email' => 'test@testing.local',
+            'password' => 'test',
+        ]);
+
+        $called = false;
+        Subscriber::onUnsubscribeFromMailingList(function ($user, $list) use (&$called) {
+            $called = true;
+            $this->assertEquals('newsletter', $list);
+        });
+
+        $this->post($expectedUser->unsubscribeLink('newsletter'), ['List-Unsubscribe' => 'One-Click'])
+            ->assertNoContent();
+
+        $this->assertTrue($called);
+    }
+
+    public function test_fake_assertions_work_when_model_is_loaded_fresh_by_the_controller()
+    {
+        // This exercises the model-identity problem: the controller loads the user via
+        // ->first(), producing a different object instance than $expectedUser. The fake's
+        // assertions must compare by primary key, not by object identity (===).
+        $fake = Subscriber::fake();
+
+        $expectedUser = DummyUser::create([
+            'name' => 'test',
+            'email' => 'test@testing.local',
+            'password' => 'test',
+        ]);
+
+        $this->get($expectedUser->unsubscribeLink())->assertSuccessful();
+
+        $fake->assertUnsubscribedFromAll($expectedUser);
+    }
+
+    public function test_it_rejects_post_without_rfc8058_body()
+    {
+        $expectedUser = DummyUser::create([
+            'name' => 'test',
+            'email' => 'test@testing.local',
+            'password' => 'test',
+        ]);
+
+        $this->post($expectedUser->unsubscribeLink())
+            ->assertStatus(400);
     }
 }

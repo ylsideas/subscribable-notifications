@@ -9,29 +9,27 @@ use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
 
 trait MailSubscriber
 {
-    /**
-     * @param string|null $mailingList
-     * @return string
-     */
-    public function unsubscribeLink(?string $mailingList = ''): string
+    public function unsubscribeLink(?string $mailingList = null): string
     {
         return URL::signedRoute(
             Subscriber::routeName(),
-            ['subscriber' => $this, 'mailingList' => $mailingList]
+            [
+                'subscriberType' => $this->getMorphClass(),
+                'subscriberId' => $this->getRouteKey(),
+                'mailingList' => $mailingList,
+            ]
         );
     }
 
-    /**
-     * @param Notification $notification
-     * @return bool
-     */
     public function mailSubscriptionStatus(Notification $notification): bool
     {
+        $list = $notification instanceof AppliesToMailingList
+            ? $notification->usesMailingList()
+            : null;
+
         return Subscriber::checkSubscriptionStatus(
             $this,
-            $notification instanceof AppliesToMailingList
-                ? $notification->usesMailingList()
-                : null
+            $list instanceof \BackedEnum ? $list->value : $list
         );
     }
 }

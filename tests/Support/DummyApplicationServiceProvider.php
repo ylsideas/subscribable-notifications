@@ -2,65 +2,31 @@
 
 namespace YlsIdeas\SubscribableNotifications\Tests\Support;
 
-use YlsIdeas\SubscribableNotifications\SubscribableApplicationServiceProvider;
+use Illuminate\Support\ServiceProvider;
+use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
 
-class DummyApplicationServiceProvider extends SubscribableApplicationServiceProvider
+class DummyApplicationServiceProvider extends ServiceProvider
 {
-    protected $model = DummyUser::class;
-
-    protected $loadRoutes = true;
-
-    public function shouldLoadRoutes($shouldLoad = false)
+    public function boot(): void
     {
-        $this->loadRoutes = $shouldLoad;
-    }
+        Subscriber::routes();
 
-    /**
-     * @return \Closure
-     */
-    public function onUnsubscribeFromMailingList()
-    {
-        return function () {
-        };
-    }
+        Subscriber::onUnsubscribeFromMailingList(function () {
+        });
 
-    /**
-     * @return \Closure
-     */
-    public function onUnsubscribeFromAllMailingLists()
-    {
-        return function () {
-        };
-    }
+        Subscriber::onUnsubscribeFromAllMailingLists(function () {
+        });
 
-    /**
-     * @return \Closure
-     */
-    public function onCompletion()
-    {
-        return function () {
-            return response()
-                ->redirectTo('/');
-        };
-    }
+        Subscriber::onCompletion(function () {
+            return redirect('/');
+        });
 
-    /**
-     * @return callable|string
-     */
-    public function onCheckSubscriptionStatusOfMailingList()
-    {
-        return function () {
+        Subscriber::onCheckSubscriptionStatusOfMailingList(function () {
             return true;
-        };
-    }
+        });
 
-    /**
-     * @return callable|string
-     */
-    public function onCheckSubscriptionStatusOfAllMailingLists()
-    {
-        return function () {
+        Subscriber::onCheckSubscriptionStatusOfAllMailingLists(function () {
             return true;
-        };
+        });
     }
 }

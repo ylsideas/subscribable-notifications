@@ -6,321 +6,417 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/ylsideas/subscribable-notifications.svg?style=flat-square)](https://packagist.org/packages/ylsideas/subscribable-notifications)
 [![Laravel Compatibility](https://badge.laravel.cloud/badge/ylsideas/subscribable-notifications?style=flat)](https://packagist.org/packages/ylsideas/subscribable-notifications)
 
-This package has been designed to help you handle email unsubscribes with as little as 5 minutes setup. After installing
-your notifications sent over email should now be delivered with unsubscribe links in the footer and as a mail header
-which email clients can present to the user for quicker unsubscribing. It can also handle resolving the unsubscribing 
-of the user through a signed route/controller.
+Handle email unsubscribes with minimal setup. The package injects unsubscribe links into notification emails, provides a signed unsubscribe route and controller, and fully complies with [RFC 8058](https://www.rfc-editor.org/rfc/rfc8058) one-click unsubscribe — required by Gmail and Yahoo for bulk senders since 2024.
+
+Every email sent through the package will include both headers automatically:
+
+```
+List-Unsubscribe: <https://example.com/unsubscribe/...>
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+```
+
+The unsubscribe route accepts `GET` (browser link) and `POST` (one-click from email clients), so users can unsubscribe without ever opening a browser.
+
+## Requirements
+
+- PHP 8.4+
+- Laravel 12 or 13
 
 ## Installation
 
-You can install the package via composer:
-
 ```bash
-composer require ylsideas/subscribable-notifications
+composer require ylsideas/subscribable-notifications:^2.0
 ```
 
-Optionally to make use of the built in unsubscribing handler you can publish the application service
-provider. If you wish to implement your own unsubscribing process and only insert unsubscribe links into
-your notifications, you can forgo doing this.
+Publish the application service provider:
 
 ```bash
 php artisan vendor:publish --tag=subscriber-provider
 ```
 
-This will create a `\App\Providers\SubscriberServiceProvider` class which you will need to register
-in `config/app.php`.
+This creates `App\Providers\SubscribableServiceProvider`. Register it in `bootstrap/providers.php` (Laravel 11+):
+
+```php
+return [
+    App\Providers\AppServiceProvider::class,
+    App\Providers\SubscribableServiceProvider::class,
+];
+```
+
+Or in `config/app.php` for older projects:
 
 ```php
 'providers' => [
-    ...
-    
-    /*
-     * Package Service Providers...
-     */
-     \App\Providers\SubscribableServiceProvider::class,
-     
-     ...
-]
+    // ...
+    App\Providers\SubscribableServiceProvider::class,
+],
 ```
 
-After this you can configure your unsubscribe handlers quickly as methods within the service provider that return the closures.
+The published provider is a plain `ServiceProvider` — open it and fill in the handler closures. There is no base class to extend or abstract methods to implement:
 
-The package itself does not determine how you store or evaluate your users' subscribed state. Instead
-it provides hooks in which to handle that.
+```php
+use Illuminate\Support\ServiceProvider;
+use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
 
-## Usage
+class SubscribableServiceProvider extends ServiceProvider
+{
+    public function boot(): void
+    {
+        Subscriber::routes();
 
-First off you must implement the `YlsIdeas\SubscribableNotifications\Contracts\CanUnsubscribe` interface
-on your notifiable User model. You can also apply the `YlsIdeas\SubscribableNotifications\MailSubscriber` trait
-which will implement this for you to automatically provide signed urls for the unsubscribe controller provided
-by this library.
+        Subscriber::onUnsubscribeFromMailingList(function ($notifiable, string $mailingList) {
+            // Remove the notifiable's subscription to the given mailing list.
+        });
 
-``` php
+        Subscriber::onUnsubscribeFromAllMailingLists(function ($notifiable) {
+            // Remove the notifiable's subscription to all mailing lists.
+        });
+
+        Subscriber::onCompletion(function ($notifiable, ?string $mailingList) {
+            return redirect('/');
+        });
+
+        Subscriber::onCheckSubscriptionStatusOfMailingList(function ($notifiable, string $mailingList): bool {
+            return true;
+        });
+
+        Subscriber::onCheckSubscriptionStatusOfAllMailingLists(function ($notifiable): bool {
+            return true;
+        });
+    }
+}
+```
+
+## Route configuration
+
+### Throttling
+
+The unsubscribe route is throttled to 60 requests per minute by default. Pass a custom rate or `false` to the `throttle` parameter to override this:
+
+```php
+Subscriber::routes();                   // default: 60 requests per minute
+Subscriber::routes(throttle: '10,1');  // 10 requests per minute
+Subscriber::routes(throttle: false);   // disable throttling
+```
+
+The `throttle` parameter accepts the same `limit,decay` string format as Laravel's `throttle` middleware.
+
+### CSRF
+
+Register the unsubscribe route **outside** the `web` middleware group. RFC 8058 one-click POST requests from email clients do not include a CSRF token, and wrapping the route in `web` will cause all POST unsubscribes to fail with a 419.
+
+The safest approach is to call `Subscriber::routes()` at the top of your service provider's `boot` method, before `Route::middleware('web')->group(...)`:
+
+```php
+public function boot(): void
+{
+    Subscriber::routes();
+
+    // ... rest of your route/handler registration
+}
+```
+
+### Legacy route (v1 compatibility)
+
+If you are running a rolling upgrade from v1 and need old unsubscribe URLs (which do not include the subscriber type) to keep working, register the legacy route alongside the new one:
+
+```php
+Subscriber::routes();
+Subscriber::legacyRoutes(\App\Models\User::class);
+```
+
+The legacy route matches `unsubscribe/{subscriberId}/{mailingList?}` and resolves the subscriber type to the given model (or its morph-map alias). All throttle options apply:
+
+```php
+Subscriber::legacyRoutes(\App\Models\User::class, throttle: '10,1');
+Subscriber::legacyRoutes(\App\Models\User::class, throttle: false);
+```
+
+See [UPGRADE.md](UPGRADE.md) for the full migration guide.
+
+## Setup
+
+### 1. Apply the trait to your notifiable model
+
+The `MailSubscriber` trait can be applied to **any Eloquent model** — not just `User`. The package uses Laravel's [morph map](https://laravel.com/docs/eloquent-relationships#custom-polymorphic-types) to identify models in signed URLs, so it works with multiple notifiable types side-by-side.
+
+```php
 use YlsIdeas\SubscribableNotifications\MailSubscriber;
 use YlsIdeas\SubscribableNotifications\Contracts\CanUnsubscribe;
+use YlsIdeas\SubscribableNotifications\Contracts\CheckSubscriptionStatusBeforeSendingNotifications;
 
-class User implements CanUnsubscribe
+class User extends Authenticatable implements CanUnsubscribe, CheckSubscriptionStatusBeforeSendingNotifications
 {
     use Notifiable, MailSubscriber;
 }
 ```
 
-### Implementing your own unsubscribe links
-
-If you wish to implement your own completely different `unsubscribeLink()` method you can.
-
-``` php
-use YlsIdeas\SubscribableNotifications\Contracts\CanUnsubscribe;
-
-class User implements CanUnsubscribe
-{
-    use Notifiable;
-    
-    public function unsubscribeLink(?string $mailingList = ''): string
-    {
-        return URL::signedRoute(
-            'sorry-to-see-you-go',
-            ['subscriber' => $this, 'mailingList' => $mailingList],
-            now()->addDays(1)
-        );
-    }
-}
-```
-
-### Implementing notifications as part of a mailing list
-
-If you wish to apply specific mailing lists to notifications you need to implement the 
-`YlsIdeas\SubscribableNotifications\Contracts\AppliesToMailingList` on those notifications.
-This will put two unsubscribe links into your emails generated from those notifications.
-One for all emails and one for only that type of email.
-
-``` php
-use YlsIdeas\SubscribableNotifications\Contracts\AppliesToMailingList;
-
-class Welcome extends Notification implements AppliesToMailingList
-{
-    ...
-    
-    public function usesMailingList(): string
-    {
-        return 'weekly-updates';
-    }
-    
-    ...
-}
-```
-
-### Using the full unsubscribing workflow
-
-Using the `App\Providers\SubscriberServiceProvider` you can set up simple hooks to handle
-unsubscribing the user from all future emails. This package doesn't determine how you should
-store that record of opting out of future emails. Instead you provide functions in the provider
-which will be called. The following are just examples of what you can do.
-
-#### Implementing an unsubscribe hook for a specific mailing list
-
-This handler will be called if a user links a link through to unsubscribe for a specific mailing list.
-
-``` php
-public class SubscriberServiceProvider
-{
-    ...
-    
-    public function onUnsubscribeFromMailingList()
-    {
-        return function ($user, $mailingList) {
-            $user->mailing_lists = $user->mailing_lists->put($mailingList, false);
-            $user->save();
-        };
-    }
-    
-    ...
-}
-```
-
-#### Implementing an unsubscribe hook for all emails
-
-This handler will be called if the user has clicked through to the link to unsubscribe from all future emails.
-
-``` php
-public class SubscriberServiceProvider
-{
-    ...
-    
-    public function onUnsubscribeFromAllMailingLists()
-    {
-        return function ($user) {
-            $user->unsubscribed_at = now();
-            $user->save();
-        };
-    }
-    
-    ...
-}
-```
-
-#### Implementing an unsubscribe response
-
-The completion handler will be called after a user is unsubscribed, allowing you to customise where the user is
-redirected to or if you want to maybe show a further form even.
-
-``` php
-public class SubscriberServiceProvider
-{
-    ...
-    
-    public function onCompletion()
-    {
-        return function ($user, $mailingList) {
-            return view('confirmation')
-                ->with('alert', 'You\'re not unsubscribed');
-        };
-    }
-    
-    ...
-}  
-```
-
-### Dedicated handler
-
-You may also provide a string in the format of `class@method` that the subscriber class will use to grab the class
-from the service container and then call the specified method on if you want to do something more custom. 
+You can apply it to any model that receives notifications:
 
 ```php
-public class SubscriberServiceProvider
+class Contact extends Model implements CanUnsubscribe, CheckSubscriptionStatusBeforeSendingNotifications
 {
-    ...
-    
-    public function onUnsubscribeFromAllMailingLists()
-    {
-        return '\App\UnsubscribeHandler@handleUnsubscribing';
-    }
-    
-    ...
+    use Notifiable, MailSubscriber;
 }
 ```
 
-### Checking if a notification should be sent per the subscription
+### 2. Register a morph map (recommended)
 
-You can also add hooks to check if a user should receive notifications for a mailing
-list or for all mail notifications.
+Without a morph map, the full class name appears in unsubscribe URLs. Registering aliases keeps URLs short and decouples them from your class names:
 
-To do this you need to make sure your user has the 
-`YlsIdeas\SubscribableNotifications\Contracts\CheckSubscriptionStatusBeforeSendingNotifications` interface
-implemented. The `YlsIdeas\SubscribableNotifications\MailSubscriber` trait will implement this for you to use the
-built in Subscriber handlers.
+```php
+// In AppServiceProvider::boot()
+use Illuminate\Database\Eloquent\Relations\Relation;
 
-If you want to implement a method yourself to check the subscription you could also just implement the method yourself
-like in the example below.
+Relation::morphMap([
+    'user'    => \App\Models\User::class,
+    'contact' => \App\Models\Contact::class,
+]);
+```
 
-``` php
-use YlsIdeas\SubscribableNotifications\Contracts\CanUnsubscribe;
-use YlsIdeas\SubscribableNotifications\Contracts\CheckSubscriptionStatusBeforeSendingNotifications;
-use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
+With this in place, a `User` unsubscribe URL looks like:
 
-class User implements CanUnsubscribe, CheckSubscriptionStatusBeforeSendingNotifications
+```
+https://example.com/unsubscribe/user/42?signature=...
+```
+
+Without it, the full class name is used instead.
+
+## Usage
+
+### Sending notifications with unsubscribe links
+
+No changes are needed to your notifications. Once the trait is on the model, every email notification sent to that model will automatically include unsubscribe links in the footer and the RFC 8058 headers.
+
+### Mailing list notifications
+
+Implement `AppliesToMailingList` on a notification to include a second, list-specific unsubscribe link alongside the global one.
+
+You can use a plain string:
+
+```php
+use YlsIdeas\SubscribableNotifications\Contracts\AppliesToMailingList;
+
+class WeeklyDigest extends Notification implements AppliesToMailingList
 {
-    use Notifiable;
-    
-    
-    public function mailSubscriptionStatus(Notification $notification) : bool
+    public function usesMailingList(): string
     {
-        return Subscriber::checkSubscriptionStatus(
-            $this,
-            $notification instanceof AppliesToMailingList
-                ? $notification->usesMailingList()
-                : null
-        );
+        return 'weekly-digest';
     }
 }
 ```
 
-Then you need to implement the 
-`YlsIdeas\SubscribableNotifications\Contracts\CheckNotifiableSubscriptionStatus` interface on the notifications
-that should trigger a check of the subscription status of the user it's being sent to. Then you just need to return
-`true` if the subscription status should be checked.
+Or a backed enum (recommended for type safety):
 
-``` php
+```php
+enum MailingList: string
+{
+    case WeeklyDigest = 'weekly-digest';
+    case ProductUpdates = 'product-updates';
+}
+
+class WeeklyDigest extends Notification implements AppliesToMailingList
+{
+    public function usesMailingList(): string|\BackedEnum
+    {
+        return MailingList::WeeklyDigest;
+    }
+}
+```
+
+### Configuring the unsubscribe handlers
+
+The five `Subscriber::on*` calls in the published provider are the only configuration needed. Each accepts a closure or a `Class@method` string that will be resolved from the service container:
+
+```php
+Subscriber::onUnsubscribeFromAllMailingLists(\App\Handlers\UnsubscribeHandler::class . '@handleAll');
+```
+
+A realistic implementation might look like:
+
+```php
+Subscriber::onUnsubscribeFromMailingList(function ($notifiable, string $mailingList) {
+    $notifiable->subscriptions()->where('list', $mailingList)->delete();
+});
+
+Subscriber::onUnsubscribeFromAllMailingLists(function ($notifiable) {
+    $notifiable->update(['unsubscribed_at' => now()]);
+});
+
+Subscriber::onCompletion(function ($notifiable, ?string $mailingList) {
+    return redirect()->route('unsubscribe.confirmed');
+});
+
+Subscriber::onCheckSubscriptionStatusOfMailingList(function ($notifiable, string $mailingList): bool {
+    return $notifiable->subscriptions()->where('list', $mailingList)->exists();
+});
+
+Subscriber::onCheckSubscriptionStatusOfAllMailingLists(function ($notifiable): bool {
+    return $notifiable->unsubscribed_at === null;
+});
+```
+
+### Blocking sends for unsubscribed users
+
+To prevent notifications being sent to users who have opted out, implement `CheckNotifiableSubscriptionStatus` on the notification:
+
+```php
 use YlsIdeas\SubscribableNotifications\Contracts\CheckNotifiableSubscriptionStatus;
 
-class Welcome extends Notification implements CheckNotifiableSubscriptionStatus
+class WeeklyDigest extends Notification implements AppliesToMailingList, CheckNotifiableSubscriptionStatus
 {
-    ...
-    
-    public function checkMailSubscriptionStatus() : bool
+    public function checkMailSubscriptionStatus(): bool
     {
         return true;
     }
-    
-    ...
 }
 ```
 
-To use the functionality you then need to add your own Subscription check hooks. These hooks can be implemented
-as you see fit.
+When this returns `true`, the channel checks `$notifiable->mailSubscriptionStatus($notification)` before sending. The `MailSubscriber` trait implements this automatically using your configured handlers. If both the mailing-list check and the all-mail check return `true`, the email sends; otherwise it is silently dropped.
 
-``` php
-public class SubscriberServiceProvider
+### Custom unsubscribe link
+
+If you implement `CanUnsubscribe` directly instead of using the `MailSubscriber` trait, generate your own signed URL:
+
+```php
+use Illuminate\Support\Facades\URL;
+use YlsIdeas\SubscribableNotifications\Contracts\CanUnsubscribe;
+use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
+
+class User extends Authenticatable implements CanUnsubscribe
 {
-    ...
+    use Notifiable;
 
-    public function onCheckSubscriptionStatusOfMailingList()
+    public function unsubscribeLink(?string $mailingList = null): string
     {
-        return function ($user, $mailingList) {
-            return $user->mailing_lists->get($mailingList, false);
-        };
+        return URL::signedRoute(
+            Subscriber::routeName(),
+            [
+                'subscriberType' => $this->getMorphClass(),
+                'subscriberId'   => $this->getRouteKey(),
+                'mailingList'    => $mailingList,
+            ]
+        );
     }
-
-    public function onCheckSubscriptionStatusOfAllMailingLists()
-    {
-        return function ($user) {
-            return $user->unsubscribed_at === null;
-        };
-    }
-    
-    ...
-}  
+}
 ```
 
 ### Customising the email templates
 
-Out of the box the emails generated use the same templates except that they
-inject a small bit of text into the footer of the emails. If you wish you customise
-the templates further you may publish the views.
+The default templates inject a small unsubscribe block into the footer of all notification emails. Publish them to customise:
 
 ```bash
 php artisan vendor:publish --tag=subscriber-views
 ```
 
-This will create a `resources/views/vendor/subscriber` folder containing both `html.blade.php`
-and `text.blade.php` which can be customised. These will then be the defaults used by the
-notification mail channel.
+This creates `resources/views/vendor/subscriber/html.blade.php` and `text.blade.php`.
 
-### Customising the User Model
+## Testing
 
-If you are using a different User model than the one found in `app/Models/User.php` or 
-`app/Users.php` for Laravel 7 and earlier you can change this by calling. It's suggested you
-do this in the boot method of the `SubscriberServiceProvider`.
+### Scaffolding your tests
 
-```php
-Subscriber::userModel('App\Models\User');
+Publish ready-to-customise test stubs into your application's `tests/Feature/` directory:
+
+```bash
+php artisan vendor:publish --tag=subscriber-tests
 ```
 
-### Testing
+This creates two files:
 
-``` bash
+| File | What it covers |
+|------|----------------|
+| `tests/Feature/UnsubscribeRouteTest.php` | GET and POST unsubscribe routes, RFC 8058 body validation, tampered-URL rejection |
+| `tests/Feature/SubscribableNotificationTest.php` | Subscription gating (subscribed sends, unsubscribed dropped), view data presence |
+
+Each file is annotated with `// TODO:` markers wherever you need to substitute your own model or notification class. The stubs use `Subscriber::fake()` so no real database handlers need to be configured.
+
+### Using the fake
+
+Use `Subscriber::fake()` in your tests to swap in a fake implementation and make assertions without needing real handlers configured:
+
+```php
+use YlsIdeas\SubscribableNotifications\Facades\Subscriber;
+
+it('unsubscribes the user from the newsletter', function () {
+    $fake = Subscriber::fake();
+    $user = User::factory()->create();
+
+    $this->get($user->unsubscribeLink('newsletter'));
+
+    $fake->assertUnsubscribedFromMailingList($user, 'newsletter');
+});
+
+it('unsubscribes the user from all emails', function () {
+    $fake = Subscriber::fake();
+    $user = User::factory()->create();
+
+    $this->get($user->unsubscribeLink());
+
+    $fake->assertUnsubscribedFromAll($user);
+});
+```
+
+Available assertions:
+
+| Method | Description |
+|--------|-------------|
+| `assertUnsubscribedFromMailingList($notifiable, $list)` | Assert the notifiable was unsubscribed from a specific list |
+| `assertUnsubscribedFromAll($notifiable)` | Assert the notifiable was globally unsubscribed |
+| `assertNothingUnsubscribed()` | Assert no unsubscribe actions occurred |
+| `assertCheckedSubscriptionStatus($notifiable, $list)` | Assert subscription status was checked for the given list (`null` for global) |
+
+To control subscription status checks in feature tests:
+
+```php
+Subscriber::fake()->alwaysUnsubscribed(); // all checkSubscriptionStatus calls return false
+Subscriber::fake()->alwaysSubscribed();   // all checkSubscriptionStatus calls return true (default)
+```
+
+### Testing subscription gating (`Mail::fake()` vs `Notification::fake()`)
+
+When testing whether an unsubscribed user is silently dropped, use `Mail::fake()` — **not** `Notification::fake()`. The subscription gate runs inside a `NotificationSending` event listener; `Notification::fake()` bypasses that event entirely, so the gate never fires and every notification appears to be sent regardless of subscription status.
+
+`Mail::fake()` intercepts at the transport layer, leaving the full notification pipeline — including the `NotificationSending` event — running normally:
+
+```php
+use Illuminate\Support\Facades\Mail;
+
+it('does not send mail to unsubscribed users', function () {
+    Mail::fake();
+    Subscriber::fake()->alwaysUnsubscribed();
+
+    $user = User::factory()->create();
+    $user->notify(new WeeklyDigest());
+
+    Mail::assertNothingSent();
+});
+
+it('sends mail to subscribed users', function () {
+    Mail::fake();
+    Subscriber::fake()->alwaysSubscribed();
+
+    $user = User::factory()->create();
+    $user->notify(new WeeklyDigest());
+
+    Mail::assertSentCount(1);
+});
+```
+
+## Running the test suite
+
+```bash
 composer test
 ```
 
-### Changelog
+## Changelog
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
 ## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-### Security
+## Security
 
 If you discover any security related issues, please email peter.fox@ylsideas.co instead of using the issue tracker.
 
@@ -332,7 +428,3 @@ If you discover any security related issues, please email peter.fox@ylsideas.co 
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
-
-## Laravel Package Boilerplate
-
-This package was generated using the [Laravel Package Boilerplate](https://laravelpackageboilerplate.com).

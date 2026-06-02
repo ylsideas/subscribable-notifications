@@ -4,8 +4,5 @@ namespace YlsIdeas\SubscribableNotifications\Contracts;
 
 interface AppliesToMailingList
 {
-    /**
-     * @return string
-     */
-    public function usesMailingList(): string;
+    public function usesMailingList(): string|\BackedEnum;
 }
