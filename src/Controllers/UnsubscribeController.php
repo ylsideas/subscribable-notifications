@@ -2,6 +2,7 @@
 
 namespace YlsIdeas\SubscribableNotifications\Controllers;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -21,7 +22,9 @@ final class UnsubscribeController extends Controller
     {
         $modelClass = Relation::getMorphedModel($subscriberType) ?? $subscriberType;
 
-        if (! class_exists($modelClass) || ! is_a($modelClass, CanUnsubscribe::class, true)) {
+        if (! class_exists($modelClass)
+            || ! is_a($modelClass, CanUnsubscribe::class, true)
+            || ! is_a($modelClass, Model::class, true)) {
             abort(403, __('Could not process unsubscribe request'));
         }
 
